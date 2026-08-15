@@ -120,8 +120,8 @@ function downsample(history: PricePoint[], max = 16): PricePoint[] {
   return out;
 }
 
-function indexAtOrBefore(history: PricePoint[], iso: string): number {
-  const t = Date.parse(iso);
+function indexAtOrBefore(history: PricePoint[], iso: string, slackMs = 0): number {
+  const t = Date.parse(iso) + slackMs;
   let idx = 0;
   for (let i = 0; i < history.length; i++) {
     if (Date.parse(history[i]!.t) <= t) idx = i;
@@ -138,7 +138,7 @@ function buildSeries(history: PricePoint[], social: number, replay: boolean) {
   if (pts.length >= 2) {
     labels.push([0, fmtDay(pts[0]!.t)]);
     labels.push([pts.length - 1, fmtDay(pts[pts.length - 1]!.t)]);
-    const noon = indexAtOrBefore(pts, REPLAY_CUTOFF);
+    const noon = indexAtOrBefore(pts, REPLAY_CUTOFF, 60_000);
     if (noon > 0 && noon < pts.length - 1) {
       labels.push([noon, "Aug 6 noon"]);
     } else {
@@ -164,10 +164,11 @@ function buildReplayStops(
   rec: CorrelateResult,
 ): { stops: ReplayStop[]; flagAt: number; initialStop: number } {
   const n = pts.length;
-  const i2am = indexAtOrBefore(pts, "2026-08-06T02:00:00Z");
-  const i10 = indexAtOrBefore(pts, "2026-08-06T10:00:00Z");
-  const iNoon = indexAtOrBefore(pts, REPLAY_CUTOFF);
-  const i4pm = indexAtOrBefore(pts, "2026-08-06T16:00:00Z");
+  const i2am = indexAtOrBefore(pts, "2026-08-06T02:00:00Z", 60_000);
+  const i10 = indexAtOrBefore(pts, "2026-08-06T10:00:00Z", 60_000);
+  // CLOB noon print is ~12:00:20 — match market.ts filter slack.
+  const iNoon = indexAtOrBefore(pts, REPLAY_CUTOFF, 60_000);
+  const i4pm = indexAtOrBefore(pts, "2026-08-06T16:00:00Z", 60_000);
 
   const mAt = (i: number) => (pts[i]?.p ?? 0.48) * 100;
   const gap = (i: number) => Math.round(Math.abs(social - mAt(i)));
