@@ -2,15 +2,38 @@
   "show": "The Idaho Murders: College Nightmare: Season 1",
   "window_start": "2026-08-03T00:00:00Z",
   "window_end": "2026-08-06T12:00:00Z",
-  "social_score": 86,
-  "web_score": 74,
-  "trend": "rising",
+  "social_score": 25,
+  "web_score": 0,
+  "trend": "flat",
   "top_sources": [
-    "PLACEHOLDER"
+    "@grok",
+    "@stawilh",
+    "@Ayoomide",
+    "@juleambrose",
+    "https://www.netflix.com/title/81683870"
   ],
   "snippets": [
-    "PLACEHOLDER - P2 replaces with real Grok X/Web search output"
+    {
+      "text": "The Idaho Murders: College Nightmare. It covers the University of Idaho student killings where one roommate was left unharmed.",
+      "source": "@grok",
+      "date": "2026-08-05T21:29:55Z"
+    },
+    {
+      "text": "FRIENDLY REMINDER Join us at 7:00 PM ET on the @Seekers4Justice Discord for The Idaho Murders: College Nightmare stream + live chat!",
+      "source": "@stawilh",
+      "date": "2026-08-05T19:11:00Z"
+    },
+    {
+      "text": "The Idaho Murders: College Nightmare. Highly recommended",
+      "source": "@Ayoomide",
+      "date": "2026-08-05T19:04:39Z"
+    },
+    {
+      "text": "18. the idaho murders: college nightmare",
+      "source": "@juleambrose",
+      "date": "2026-08-06T11:24:42Z"
+    }
   ],
-  "timestamp": "2026-08-06T12:00:00Z",
+  "timestamp": "2026-08-15T17:51:07.776Z",
   "source": "grok_search"
 }
