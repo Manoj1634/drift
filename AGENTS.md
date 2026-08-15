@@ -52,6 +52,12 @@ The product does **not** predict guaranteed profit and does **not** claim manipu
 - returns a counterargument
 - cites/returns evidence sources
 
+## UI — build against the mock
+
+`mock/index.html` is a working, self-contained mock of both screens: feed, investigation, chart, replay scrubber, agent strip, counterargument block, paper ticket. Open it, then copy its `:root` token block into the app and build the components to match. Read [`mock/README.md`](mock/README.md) first — it says what to lift (tokens, components, chart code) and what to ignore (the invented data and market names, which predate the Netflix lock).
+
+Agents building UI: do not invent a second palette. The two series colors are validated for colorblind separation in both themes.
+
 ## Required Product Screens
 
 ### Screen 1 — Signal Feed
@@ -145,33 +151,48 @@ Do not hardcode a rule such as `if social > market then BUY` and use Grok only t
 
 ## Shared Integration Contract
 
+**This block matches the real captured fixtures in `shared/fixtures/`.** Those files are the ground truth — if this block and a fixture ever disagree, the fixture wins and this block gets corrected.
+
 ```json
 {
   "market": {
-    "id": "string",
-    "title": "string",
-    "odds_by_outcome": {"Outcome A": 0.41, "Outcome B": 0.22},
-    "history": [{"t": "ISO8601", "odds_by_outcome": {}}],
+    "id": "what-will-be-the-top-us-netflix-show-this-week-20260812180419528",
+    "title": "What will be the top US Netflix show this week?",
+    "odds_by_show": {"Show A": 0.937, "Show B": 0.0615, "Show C": 0.008},
+    "clob_token_ids": {"Show A": "1081613535..."},
+    "price_history": [{"t": "ISO8601", "p": 0.425}],
     "volume_24h": 0,
     "timestamp": "ISO8601"
   },
   "evidence": {
-    "scores_by_outcome": {"Outcome A": 71, "Outcome B": 88},
+    "show": "Show A",
+    "window_start": "ISO8601",
+    "window_end": "ISO8601",
+    "social_score": 86,
+    "web_score": 74,
     "trend": "rising",
+    "top_sources": [],
     "snippets": [],
-    "sources": [],
-    "source": "x_search|pytrends",
-    "timestamp": "ISO8601"
+    "timestamp": "ISO8601",
+    "source": "grok_search"
   },
-  "truth": {
+  "culture": {
     "week_of": "YYYY-MM-DD",
-    "official_rank": [],
-    "source": "netflix_tudum|google_trends"
+    "official_rank": ["Show A"],
+    "views": null,
+    "previous_rank": null,
+    "source": "netflix_tudum",
+    "as_of": "ISO8601"
   },
-  "signal": {
+  "recommendation": {
+    "market_id": "string",
+    "as_of": "ISO8601",
     "verdict": "aligned|diverged",
+    "suggested_side": "YES|NO|WATCH",
     "divergence_score": 0,
+    "confidence": 0,
     "explanation": "",
+    "supporting_reasons": [],
     "counterargument": "",
     "sources": [],
     "flagged": false
@@ -181,11 +202,9 @@ Do not hardcode a rule such as `if social > market then BUY` and use Grok only t
 
 Do not silently change this contract.
 
-**Why `odds_by_outcome` and not `yes_price`/`no_price`:** most of the markets on the shortlist (`#1 Searched TV Show / Actor / Athlete on Google 2026`) are multi-outcome races, not binaries. A two-field price can't represent them. This shape handles binaries too — a binary is just two outcomes.
+`odds_by_show` is a **map**, not a `yes_price`/`no_price` pair — these markets carry three or more shows and a two-field price cannot represent them.
 
 `counterargument` is not optional. Grok returns the strongest case that the gap is noise, in the same structured call. It costs nothing and it is the difference between an analyst and a hype machine.
-
-A complete, hand-written instance of this contract lives at `shared/fixtures/demo.json` and exists **before** any integration works. Every track builds against that file so nobody is blocked on anybody.
 
 ## Team Ownership
 

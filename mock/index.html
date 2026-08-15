@@ -1,0 +1,796 @@
+<title>Drift</title>
+<style>
+  :root {
+    --ground: #FCFCFB; --card: #FFFFFF; --inset: #F6F4F0; --rail: #F8F7F4;
+    --ink: #1B1A18; --ink-2: #4A4740; --muted: #6E6A63;
+    --hairline: #E9E6E0; --hairline-2: #DEDAD2;
+    --market: #2E7FC2; --evidence: #CE8022; --gap-fill: rgba(206,128,34,.13);
+    --flag: #A8443A; --flag-bg: rgba(168,68,58,.09);
+    --calm: #5C7A62; --calm-bg: rgba(92,122,98,.10);
+    --shadow: 0 1px 2px rgba(27,26,24,.05), 0 8px 24px -12px rgba(27,26,24,.14);
+    --shadow-lift: 0 2px 4px rgba(27,26,24,.06), 0 16px 40px -16px rgba(27,26,24,.22);
+    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+    --r: 14px; --r-sm: 9px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #17161A; --card: #1F1E23; --inset: #26252B; --rail: #1B1A1F;
+      --ink: #F2F0EC; --ink-2: #C8C4BC; --muted: #9C978E;
+      --hairline: #2E2C33; --hairline-2: #3A383F;
+      --market: #4A8FD4; --evidence: #C08438; --gap-fill: rgba(192,132,56,.17);
+      --flag: #CE7166; --flag-bg: rgba(206,113,102,.14);
+      --calm: #86A88C; --calm-bg: rgba(134,168,140,.13);
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+      --shadow-lift: 0 2px 4px rgba(0,0,0,.5), 0 16px 40px -16px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #17161A; --card: #1F1E23; --inset: #26252B; --rail: #1B1A1F;
+    --ink: #F2F0EC; --ink-2: #C8C4BC; --muted: #9C978E;
+    --hairline: #2E2C33; --hairline-2: #3A383F;
+    --market: #4A8FD4; --evidence: #C08438; --gap-fill: rgba(192,132,56,.17);
+    --flag: #CE7166; --flag-bg: rgba(206,113,102,.14);
+    --calm: #86A88C; --calm-bg: rgba(134,168,140,.13);
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    --shadow-lift: 0 2px 4px rgba(0,0,0,.5), 0 16px 40px -16px rgba(0,0,0,.7);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: var(--sans); font-size: 16px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+
+  /* ---------- rail ---------- */
+  .rail {
+    background: var(--rail); border-right: 1px solid var(--hairline);
+    padding: 20px 16px; display: flex; flex-direction: column; gap: 26px;
+    position: sticky; top: 0; height: 100vh;
+  }
+  .mark { display: flex; align-items: center; gap: 9px; padding: 0 8px; }
+  .mark-name { font-size: 17px; font-weight: 640; letter-spacing: -.022em; }
+  .nav { display: flex; flex-direction: column; gap: 2px; }
+  .nav-h {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted); padding: 0 8px 8px;
+  }
+  .nav button {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    background: none; border: 0; cursor: pointer; text-align: left;
+    font-family: inherit; font-size: 14.5px; letter-spacing: -.008em;
+    color: var(--ink-2); padding: 8px 9px; border-radius: var(--r-sm);
+    transition: background .15s ease, color .15s ease;
+  }
+  .nav button:hover { background: var(--inset); color: var(--ink); }
+  .nav button[aria-current="true"] { background: var(--inset); color: var(--ink); font-weight: 560; }
+  .nav button:focus-visible { outline: 2px solid var(--market); outline-offset: -2px; }
+  .nav .count {
+    margin-left: auto; font-family: var(--mono); font-size: 11.5px;
+    color: var(--muted); font-variant-numeric: tabular-nums;
+  }
+  .nav .count.hot { color: var(--flag); }
+  .rail-foot { margin-top: auto; padding: 0 8px; }
+  .bal-l { font-family: var(--mono); font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+  .bal-v { font-family: var(--mono); font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -.02em; margin-top: 3px; }
+  .bal-d { font-family: var(--mono); font-size: 11.5px; color: var(--calm); margin-top: 2px; }
+
+  /* ---------- main ---------- */
+  .main { min-width: 0; padding: 34px 40px 90px; max-width: 1100px; }
+  .view[hidden] { display: none; }
+
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin: 0 0 9px; }
+  h1 { font-size: 30px; line-height: 1.16; font-weight: 650; letter-spacing: -.028em; margin: 0; text-wrap: balance; }
+  h2 { font-size: 19px; font-weight: 620; letter-spacing: -.018em; margin: 0; }
+  .lede { color: var(--muted); font-size: 15px; margin: 9px 0 0; max-width: 64ch; }
+  .card { background: var(--card); border: 1px solid var(--hairline); border-radius: var(--r); box-shadow: var(--shadow); }
+
+  .toolbar { display: flex; gap: 8px; align-items: center; margin: 24px 0 14px; flex-wrap: wrap; }
+  .seg { display: flex; gap: 2px; background: var(--inset); border-radius: 100px; padding: 3px; }
+  .seg button {
+    border: 0; background: none; cursor: pointer; font-family: inherit;
+    font-size: 13px; letter-spacing: -.005em; color: var(--muted);
+    padding: 6px 14px; border-radius: 100px; transition: background .15s ease, color .15s ease;
+  }
+  .seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); font-weight: 560; box-shadow: var(--shadow); }
+  .seg button:focus-visible { outline: 2px solid var(--market); outline-offset: 1px; }
+  .live {
+    margin-left: auto; font-family: var(--mono); font-size: 11.5px; color: var(--muted);
+    display: flex; align-items: center; gap: 7px;
+  }
+  .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--calm); animation: pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: .3 } }
+
+  /* ---------- feed ---------- */
+  .feed { overflow: hidden; }
+  .feed-head, .row {
+    display: grid; grid-template-columns: minmax(0,1fr) 120px 74px 74px 118px;
+    gap: 18px; align-items: center; padding: 0 22px;
+  }
+  .feed-head {
+    height: 38px; border-bottom: 1px solid var(--hairline);
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .07em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .feed-head .r, .row .r { text-align: right; }
+  .row {
+    width: 100%; background: none; border: 0; border-bottom: 1px solid var(--hairline);
+    cursor: pointer; font-family: inherit; text-align: left; padding-top: 15px; padding-bottom: 15px;
+    transition: background .14s ease;
+  }
+  .row:last-child { border-bottom: 0; }
+  .row:hover { background: var(--inset); }
+  .row:focus-visible { outline: 2px solid var(--market); outline-offset: -2px; }
+  .q { min-width: 0; }
+  .q-t { font-size: 14.5px; font-weight: 550; letter-spacing: -.012em; color: var(--ink); line-height: 1.4; }
+  .q-m { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .num { font-family: var(--mono); font-size: 14px; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .num.big { font-size: 17px; font-weight: 600; color: var(--ink); letter-spacing: -.02em; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px; border-radius: 100px;
+    padding: 4px 11px 4px 9px; font-size: 12.5px; font-weight: 540; letter-spacing: -.005em;
+    border: 1px solid transparent; white-space: nowrap;
+  }
+  .pill.flag { color: var(--flag); background: var(--flag-bg); border-color: color-mix(in srgb, var(--flag) 26%, transparent); }
+  .pill.calm { color: var(--calm); background: var(--calm-bg); border-color: color-mix(in srgb, var(--calm) 26%, transparent); }
+  .pill.mute { color: var(--muted); background: var(--inset); border-color: var(--hairline-2); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
+  .spark { display: block; width: 120px; height: 38px; }
+
+  /* ---------- detail ---------- */
+  .back {
+    display: inline-flex; align-items: center; gap: 7px; background: none; border: 0;
+    cursor: pointer; font-family: var(--mono); font-size: 11.5px; letter-spacing: .05em;
+    text-transform: uppercase; color: var(--muted); padding: 0; margin-bottom: 20px;
+    transition: color .15s ease;
+  }
+  .back:hover { color: var(--ink); }
+  .back:focus-visible { outline: 2px solid var(--market); outline-offset: 3px; }
+
+  section { margin-top: 20px; }
+  .hero { padding: 26px 28px 22px; }
+  .hero-head { display: flex; gap: 26px; align-items: flex-start; flex-wrap: wrap; }
+  .hero-title { flex: 1 1 320px; min-width: 0; }
+  .market-q { font-size: 22px; font-weight: 620; letter-spacing: -.02em; line-height: 1.3; margin: 0; text-wrap: balance; }
+  .meta { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 11px; font-family: var(--mono); font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .meta b { color: var(--ink-2); font-weight: 500; }
+  .score-block { flex: 0 0 auto; text-align: right; }
+  .score { font-family: var(--mono); font-size: 52px; font-weight: 600; line-height: 1; letter-spacing: -.045em; font-variant-numeric: tabular-nums; display: block; transition: color .3s ease; }
+  .score-sub { font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+  .score-block .pill { margin-top: 11px; }
+
+  .chart-shell { margin-top: 20px; position: relative; }
+  .chart-shell svg { display: block; width: 100%; height: auto; touch-action: none; }
+  .series-line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .grid-line { stroke: var(--hairline); stroke-width: 1; }
+  .axis-txt { font-family: var(--mono); font-size: 10.5px; fill: var(--muted); }
+  .end-label { font-family: var(--mono); font-size: 12px; font-weight: 600; }
+  .legend { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 13px; font-size: 13.5px; color: var(--ink-2); }
+  .legend i { width: 16px; height: 3px; border-radius: 2px; display: inline-block; margin-right: 8px; vertical-align: middle; }
+  .legend em { font-style: normal; color: var(--muted); font-family: var(--mono); font-size: 12px; }
+  .sw-gap { width: 16px; height: 11px; border-radius: 3px; display: inline-block; margin-right: 8px; vertical-align: middle; background: var(--gap-fill); border: 1px solid var(--hairline-2); }
+
+  .tip {
+    position: absolute; pointer-events: none; opacity: 0; transition: opacity .12s ease;
+    background: var(--card); border: 1px solid var(--hairline-2); border-radius: var(--r-sm);
+    box-shadow: var(--shadow-lift); padding: 10px 12px; min-width: 150px;
+    font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums;
+  }
+  .tip.on { opacity: 1; }
+  .tip-day { color: var(--muted); font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 7px; }
+  .tip-row { display: flex; justify-content: space-between; gap: 16px; color: var(--ink-2); }
+  .tip-row + .tip-row { margin-top: 3px; }
+  .tip-row b { color: var(--ink); font-weight: 600; }
+  .tip-gap { margin-top: 7px; padding-top: 7px; border-top: 1px solid var(--hairline); }
+
+  .why { padding: 24px 28px 26px; }
+  .explain { font-size: 16.5px; line-height: 1.62; letter-spacing: -.008em; max-width: 66ch; margin: 12px 0 0; }
+  .counter { margin-top: 18px; background: var(--inset); border-radius: var(--r-sm); padding: 15px 17px; border-left: 2px solid var(--hairline-2); }
+  .counter .eyebrow { margin-bottom: 5px; }
+  .counter p { color: var(--ink-2); font-size: 14.5px; line-height: 1.58; max-width: 62ch; margin: 0; }
+  .sources { display: grid; gap: 10px; margin-top: 20px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .src { border: 1px solid var(--hairline); border-radius: var(--r-sm); padding: 12px 13px; }
+  .src-top { display: flex; align-items: center; gap: 7px; margin-bottom: 6px; font-family: var(--mono); font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+  .src q { font-size: 13.5px; color: var(--ink-2); line-height: 1.5; }
+
+  /* ---------- agent trail ---------- */
+  .trail { padding: 20px 28px 22px; }
+  .steps { display: flex; gap: 0; margin-top: 16px; flex-wrap: wrap; }
+  .step { flex: 1 1 150px; padding-right: 16px; border-left: 1px solid var(--hairline); padding-left: 14px; }
+  .step:first-child { border-left: 0; padding-left: 0; }
+  .step-n { font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .step-v { font-family: var(--mono); font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 5px; letter-spacing: -.02em; }
+  .step-s { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+  /* ---------- replay ---------- */
+  .replay { padding: 22px 28px 24px; }
+  .replay-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+  .replay-head .lede { margin: 0; font-size: 14px; }
+  .stops { display: flex; position: relative; }
+  .stops::before { content: ""; position: absolute; left: 6%; right: 6%; top: 7px; height: 1px; background: var(--hairline-2); }
+  .stop { flex: 1; background: none; border: 0; padding: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 9px; font-family: inherit; color: var(--muted); position: relative; -webkit-tap-highlight-color: transparent; }
+  .stop-pin { width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--hairline-2); background: var(--card); transition: border-color .2s ease, background .2s ease, transform .2s ease; }
+  .stop-txt { font-size: 12.5px; line-height: 1.35; text-align: center; letter-spacing: -.005em; transition: color .2s ease; }
+  .stop-day { font-family: var(--mono); font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; opacity: .72; }
+  .stop:hover .stop-pin { border-color: var(--ink-2); }
+  .stop[aria-current="true"] .stop-pin { border-color: var(--market); background: var(--market); transform: scale(1.18); }
+  .stop[aria-current="true"] .stop-txt { color: var(--ink); font-weight: 560; }
+  .stop:focus-visible { outline: none; }
+  .stop:focus-visible .stop-pin { box-shadow: 0 0 0 3px color-mix(in srgb, var(--market) 35%, transparent); }
+  .locked { display: flex; align-items: center; gap: 10px; padding: 15px 17px; background: var(--inset); border-radius: var(--r-sm); color: var(--muted); font-size: 14px; margin-top: 14px; }
+
+  /* ---------- ticket ---------- */
+  .ticket { padding: 22px 28px 24px; display: flex; gap: 26px; align-items: flex-end; flex-wrap: wrap; }
+  .ticket-main { flex: 1 1 300px; min-width: 0; }
+  .outcomes { display: flex; gap: 8px; margin-top: 13px; flex-wrap: wrap; }
+  .outcome {
+    border: 1px solid var(--hairline-2); background: var(--card); color: var(--ink-2);
+    border-radius: 100px; padding: 8px 15px; cursor: pointer; font-family: var(--sans);
+    font-size: 13.5px; letter-spacing: -.005em; display: inline-flex; align-items: baseline; gap: 9px;
+    transition: border-color .18s ease, background .18s ease, color .18s ease;
+  }
+  .outcome span { font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; opacity: .72; }
+  .outcome:hover { border-color: var(--ink-2); }
+  .outcome[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--ground); }
+  .outcome:focus-visible { outline: 2px solid var(--market); outline-offset: 2px; }
+  .btn {
+    border: 0; border-radius: 100px; cursor: pointer; background: var(--ink); color: var(--ground);
+    font-family: var(--sans); font-size: 15px; font-weight: 560; letter-spacing: -.01em;
+    padding: 12px 25px; white-space: nowrap; transition: transform .15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:focus-visible { outline: 2px solid var(--market); outline-offset: 3px; }
+  .btn[disabled] { cursor: default; background: var(--inset); color: var(--calm); border: 1px solid var(--hairline-2); transform: none; }
+  .filled { font-family: var(--mono); font-size: 12.5px; color: var(--calm); margin-top: 9px; display: none; align-items: center; gap: 7px; }
+  .filled.on { display: flex; }
+
+  /* ---------- positions ---------- */
+  .pos-head, .pos-row {
+    display: grid; grid-template-columns: minmax(0,1fr) 96px 84px 84px 92px;
+    gap: 18px; align-items: center; padding: 0 22px;
+  }
+  .pos-head { height: 38px; border-bottom: 1px solid var(--hairline); font-family: var(--mono); font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+  .pos-row { padding-top: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--hairline); }
+  .pos-row:last-child { border-bottom: 0; }
+  .pos-head .r, .pos-row .r { text-align: right; }
+  .up { color: var(--calm); } .down { color: var(--flag); }
+  .empty { padding: 46px 28px; text-align: center; color: var(--muted); }
+  .empty h2 { color: var(--ink); margin-bottom: 6px; }
+
+  .foot { margin-top: 26px; font-family: var(--mono); font-size: 11.5px; color: var(--muted); text-align: center; }
+
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .rail { position: static; height: auto; flex-direction: row; align-items: center; gap: 18px; padding: 12px 18px; border-right: 0; border-bottom: 1px solid var(--hairline); }
+    .rail .nav-h, .rail-foot { display: none; }
+    .nav { flex-direction: row; margin-left: auto; }
+    .main { padding: 24px 18px 70px; }
+    .feed-head, .row { grid-template-columns: minmax(0,1fr) 74px 110px; }
+    .feed-head .hide-s, .row .hide-s { display: none; }
+    .pos-head, .pos-row { grid-template-columns: minmax(0,1fr) 84px 90px; }
+    .stop-txt { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="app">
+  <aside class="rail">
+    <div class="mark">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
+        <path d="M2 11 C 7 11, 8 11, 11 11 C 14 11, 15 5, 20 4" fill="none" stroke="var(--evidence)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M2 11 C 7 11, 8 11, 11 11 C 14 11, 15 16, 20 18" fill="none" stroke="var(--market)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span class="mark-name">Drift</span>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-h">Workspace</div>
+      <button type="button" data-go="feed" aria-current="true">Signals <span class="count hot" id="n-flagged">2</span></button>
+      <button type="button" data-go="positions">Paper positions <span class="count">3</span></button>
+    </nav>
+
+    <div class="rail-foot">
+      <div class="bal-l">Paper balance</div>
+      <div class="bal-v">$1,043.00</div>
+      <div class="bal-d">+$43.00 since open</div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ============ FEED ============ -->
+    <div class="view" id="v-feed">
+      <p class="eyebrow">Signals</p>
+      <h1>Two markets have stopped agreeing with the crowd.</h1>
+      <p class="lede">Drift watches prediction-market pricing next to what people are actually searching and posting about, and scores the gap between them.</p>
+
+      <div class="toolbar">
+        <div class="seg" id="filter">
+          <button type="button" data-f="all" aria-pressed="true">All</button>
+          <button type="button" data-f="flag">Diverged</button>
+          <button type="button" data-f="calm">Aligned</button>
+        </div>
+        <div class="live"><i class="pulse"></i>Market 30s · evidence 10m · last check 14s ago</div>
+      </div>
+
+      <div class="card feed">
+        <div class="feed-head">
+          <span>Market</span>
+          <span class="hide-s">14-day gap</span>
+          <span class="r hide-s">Market</span>
+          <span class="r">Evidence</span>
+          <span class="r">Divergence</span>
+        </div>
+        <div id="rows"></div>
+      </div>
+
+      <p class="foot">Drift surfaces a divergence between public data sources. Not financial advice, no real trades placed, no claim of market manipulation.</p>
+    </div>
+
+    <!-- ============ DETAIL ============ -->
+    <div class="view" id="v-detail" hidden>
+      <button class="back" type="button" data-go="feed">← All signals</button>
+
+      <section class="card hero" style="margin-top:0">
+        <div class="hero-head">
+          <div class="hero-title">
+            <p class="eyebrow" id="d-venue">Polymarket</p>
+            <p class="market-q" id="d-q">—</p>
+            <div class="meta">
+              <span>Volume <b id="d-vol">—</b></span>
+              <span>Market <b id="d-odds">—</b></span>
+              <span>Evidence <b id="d-ev">—</b></span>
+            </div>
+          </div>
+          <div class="score-block">
+            <span class="score" id="d-score">—</span>
+            <div class="score-sub">Divergence</div>
+            <div class="pill" id="d-pill"><i class="dot"></i><span>—</span></div>
+          </div>
+        </div>
+
+        <div class="chart-shell">
+          <svg id="chart" viewBox="0 0 760 240" role="img" aria-labelledby="c-desc">
+            <desc id="c-desc">Market-implied probability plotted against the public evidence score over fourteen days.</desc>
+            <g id="g-grid"></g>
+            <path id="p-gap" fill="var(--gap-fill)"></path>
+            <path id="p-market" class="series-line" stroke="var(--market)"></path>
+            <path id="p-evidence" class="series-line" stroke="var(--evidence)"></path>
+            <g id="g-flag"></g><g id="g-ends"></g><g id="g-hover"></g>
+          </svg>
+          <div class="tip" id="tip">
+            <div class="tip-day" id="tip-day"></div>
+            <div class="tip-row"><span>Market</span><b id="tip-m"></b></div>
+            <div class="tip-row"><span>Evidence</span><b id="tip-e"></b></div>
+            <div class="tip-row tip-gap"><span>Gap</span><b id="tip-g"></b></div>
+          </div>
+        </div>
+
+        <div class="legend">
+          <span><i style="background:var(--market)"></i>Market-implied probability <em>Polymarket</em></span>
+          <span><i style="background:var(--evidence)"></i>Public evidence score <em>Grok · X + Google Trends</em></span>
+          <span><i class="sw-gap"></i>The gap Drift is scoring</span>
+        </div>
+      </section>
+
+      <section class="card trail">
+        <h2>What ran</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-n"><i class="dot" style="background:var(--market)"></i>Market Pulse</div>
+            <div class="step-v" id="t-market">—</div>
+            <div class="step-s">Polymarket CLOB · 14s ago</div>
+          </div>
+          <div class="step">
+            <div class="step-n"><i class="dot" style="background:var(--evidence)"></i>Evidence Scout</div>
+            <div class="step-v" id="t-ev">—</div>
+            <div class="step-s">Grok x_search · 4m ago</div>
+          </div>
+          <div class="step">
+            <div class="step-n"><i class="dot" style="background:var(--evidence)"></i>Trends</div>
+            <div class="step-v" id="t-tr">—</div>
+            <div class="step-s">pytrends · 9m ago</div>
+          </div>
+          <div class="step">
+            <div class="step-n"><i class="dot" style="background:var(--calm)"></i>Correlator</div>
+            <div class="step-v" id="t-cor">—</div>
+            <div class="step-s">grok-4.6 structured · 14s ago</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card why">
+        <p class="eyebrow">Grok's read</p>
+        <h2>Why?</h2>
+        <p class="explain" id="d-explain">—</p>
+        <div class="counter">
+          <p class="eyebrow">The case against this signal</p>
+          <p id="d-counter">—</p>
+        </div>
+        <div class="sources" id="d-sources"></div>
+      </section>
+
+      <section class="card replay">
+        <div class="replay-head">
+          <h2>Replay</h2>
+          <p class="lede">What Drift would have shown you, before the answer was obvious.</p>
+        </div>
+        <div class="stops" id="stops"></div>
+        <div class="locked" id="locked" hidden>
+          <i class="dot" style="background:var(--muted)"></i>
+          Replay unlocks once this market resolves. Drift needs a known outcome to replay against.
+        </div>
+      </section>
+
+      <section class="card ticket">
+        <div class="ticket-main">
+          <p class="eyebrow">Paper position · nothing is placed on-chain</p>
+          <h2>Take a side</h2>
+          <div class="outcomes" id="outcomes"></div>
+        </div>
+        <div>
+          <button class="btn" id="place">Log paper position</button>
+          <div class="filled" id="filled"><i class="dot"></i><span id="filled-txt"></span></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ POSITIONS ============ -->
+    <div class="view" id="v-positions" hidden>
+      <p class="eyebrow">Paper positions</p>
+      <h1>Three open. Nothing real was placed.</h1>
+      <p class="lede">Every position Drift logs is local. There is no wallet, no signing, and no order ever reaches an exchange.</p>
+
+      <div class="card" style="margin-top:24px">
+        <div class="pos-head">
+          <span>Position</span>
+          <span class="hide-s">Entry</span>
+          <span class="r hide-s">Now</span>
+          <span class="r">Stake</span>
+          <span class="r">Change</span>
+        </div>
+        <div id="pos-rows"></div>
+      </div>
+      <p class="foot">Paper positions are logged locally for demonstration. Drift does not execute trades.</p>
+    </div>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var el = function (i) { return document.getElementById(i); };
+  var NS = "http://www.w3.org/2000/svg";
+  function mk(t, a, x) { var n = document.createElementNS(NS, t); for (var k in a) n.setAttribute(k, a[k]); if (x != null) n.textContent = x; return n; }
+
+  var MARKETS = [
+    {
+      id: "tv", venue: "Polymarket · resolves Dec 31", vol: "$91,938",
+      q: "Will Ash & Ember be the #1 searched TV show on Google in 2026?",
+      market:   [62,63,61,62,60,59,58,57,56,58,63,69,74,78,81],
+      evidence: [58,60,62,66,71,75,80,84,87,89,90,91,92,93,94],
+      score: 78, verdict: "Diverged", tone: "flag", flagDay: 8,
+      explain: "Search interest and post volume for Ash & Ember have climbed six straight days while the market has drifted three points the other way. Every other candidate in this market is flat or falling. The crowd has moved and the price has not followed it yet.",
+      counter: "Search spikes around a finale and decays within a week — this could be an episode bump, not a durable shift. The market also prices the full year, and two contenders have not premiered yet. A flat price may be traders correctly discounting a short-lived surge.",
+      sources: [["X · 4,102 posts", "ev", "nobody is talking about anything else this week, the finale broke me"],
+                ["Google Trends", "ev", "Search interest up 61% week over week, US · breakout in 38 states"],
+                ["Polymarket CLOB", "mk", "Best bid 0.56 · no order over $2k in the last 48 hours"]],
+      outcomes: [["Ash & Ember","56%"],["The Quiet Ward","22%"],["Long Division","14%"],["Other","8%"]],
+      replay: [
+        { day: 4,  score: 18, verdict: "Aligned", tone: "calm", label: "Signals agree",
+          explain: "Market pricing and public evidence are within eleven points of each other and moving the same direction. Nothing here needs a decision.",
+          counter: "Eleven points is not zero. If evidence keeps climbing while the price holds, this becomes worth watching within a couple of days." },
+        { day: 6,  score: 41, verdict: "Watching", tone: "mute", label: "Evidence pulls ahead",
+          explain: "Evidence has risen twenty-two points in six days while the market has given back four. The gap is widening in one direction, which is the pattern that usually precedes a repricing — but it is only two days old.",
+          counter: "Two days is inside the noise band for social volume. A single viral post produces this shape and then vanishes." },
+        { day: 8,  score: 78, verdict: "Diverged", tone: "flag", label: "Drift flags it",
+          explain: "Search interest and post volume for Ash & Ember have climbed six straight days while the market has drifted three points the other way. Every other candidate in this market is flat or falling. The crowd has moved and the price has not followed it yet.",
+          counter: "Search spikes around a finale and decays within a week — this could be an episode bump, not a durable shift. The market also prices the full year, and two contenders have not premiered yet. A flat price may be traders correctly discounting a short-lived surge." },
+        { day: 11, score: 44, verdict: "Closing", tone: "mute", label: "Market reprices",
+          explain: "The market has moved thirteen points in three days and is now heading toward the evidence rather than away from it. The gap Drift flagged on day eight is closing from the price side.",
+          counter: "Catching up is not the same as being led. Volume arrived alongside a press cycle both signals could have reacted to independently." },
+        { day: 14, score: 19, verdict: "Resolved", tone: "calm", label: "Signals agree again",
+          explain: "The market closed most of the gap over six days and now sits thirteen points under the evidence score. The divergence Drift flagged on day eight no longer exists.",
+          counter: "One episode is not a track record. The honest read is that the signal appeared early here — not that it will every time." }
+      ]
+    },
+    {
+      id: "actor", venue: "Polymarket · resolves Dec 31", vol: "$57,430",
+      q: "Will Mara Oyelaran be the #1 searched actor on Google in 2026?",
+      market:   [31,32,33,32,34,33,35,34,36,35,37,36,38,37,39],
+      evidence: [34,36,39,44,48,53,57,60,64,67,69,71,72,74,76],
+      score: 61, verdict: "Diverged", tone: "flag", flagDay: 9,
+      explain: "Evidence has more than doubled in two weeks on the back of a festival run and a franchise casting rumor. The market has moved eight points across the same window. This is the widest sustained gap Drift is currently tracking on any actor market.",
+      counter: "Casting rumors are the noisiest input Drift consumes and they reverse without warning. The market may simply be pricing the rumor's failure rate, which historically is high.",
+      sources: [["X · 9,860 posts", "ev", "if the casting rumor is true this is the biggest year anyone's had in a decade"],
+                ["Google Trends", "ev", "Search interest up 118% over 14 days · rising in every region"],
+                ["Polymarket CLOB", "mk", "Best bid 0.39 · spread widened to 4c overnight"]],
+      outcomes: [["Mara Oyelaran","39%"],["D. Whitfield","28%"],["Other","33%"]]
+    },
+    {
+      id: "album", venue: "Polymarket · resolves Sep 7", vol: "$25,591",
+      q: "Will Carly Rae Jepsen's Day and Night sell under 30k first week?",
+      market:   [55,56,54,55,53,54,52,53,51,52,50,51,49,50,48],
+      evidence: [50,52,51,54,56,58,57,60,62,61,64,66,65,68,70],
+      score: 34, verdict: "Watching", tone: "mute", flagDay: null,
+      explain: "Evidence is trending up while the market drifts down, which is directionally the pattern Drift looks for — but the gap is twenty-two points and has not held for more than three days at a time. This is on the watch list, not flagged.",
+      counter: "Streaming chatter has a weak historical relationship with first-week physical and equivalent sales. This signal may be measuring the wrong thing entirely for this market type.",
+      sources: [["X · 1,204 posts", "ev", "the rollout has been perfect, this is going to do numbers"],
+                ["Google Trends", "ev", "Search interest up 24% week over week, US"],
+                ["Polymarket CLOB", "mk", "Best bid 0.48 · thin book both sides"]],
+      outcomes: [["Under 30k","48%"],["Over 30k","52%"]]
+    },
+    {
+      id: "athlete", venue: "Polymarket · resolves Dec 31", vol: "$43,183",
+      q: "Will Idris Kovač be the #1 searched athlete on Google in 2026?",
+      market:   [44,45,46,45,47,48,47,49,50,49,51,52,51,53,54],
+      evidence: [46,47,49,48,51,52,54,55,57,58,59,61,60,62,64],
+      score: 12, verdict: "Aligned", tone: "calm", flagDay: null,
+      explain: "Both signals have risen roughly in step for two weeks and sit ten points apart, which is inside the band Drift treats as agreement for a market this liquid. The price is tracking the conversation.",
+      counter: "Agreement is not confirmation. Both signals could be following the same news cycle, which means they would also be wrong together.",
+      sources: [["X · 2,780 posts", "ev", "the run he's on right now is genuinely absurd"],
+                ["Google Trends", "ev", "Search interest up 19% week over week, steady climb"],
+                ["Polymarket CLOB", "mk", "Best bid 0.54 · deep book, tight spread"]],
+      outcomes: [["Idris Kovač","54%"],["L. Marchetti","24%"],["Other","22%"]]
+    },
+    {
+      id: "netflix", venue: "Polymarket · resolved Aug 10", vol: "$18,470",
+      q: "Was The Quiet Ward Netflix's #1 show for the week of Aug 10?",
+      market:   [40,42,44,47,50,54,58,61,64,66,69,71,73,75,77],
+      evidence: [43,45,48,50,53,57,60,63,65,68,70,72,74,76,78],
+      score: 9, verdict: "Aligned", tone: "calm", flagDay: null,
+      explain: "This one resolved on Sunday and both signals called it. Market and evidence rose together all week and finished a point apart. Drift never flagged it, which is the correct behaviour — most weeks the market is right.",
+      counter: "A market Drift agreed with is not evidence the scoring works. The test is whether it stays quiet on the weeks it should and speaks on the weeks it shouldn't.",
+      sources: [["X · 3,340 posts", "ev", "watched the whole thing in a night, everyone I know is on it"],
+                ["Netflix Tudum", "ev", "Official Top 10 · #1 for the week of Aug 10"],
+                ["Polymarket CLOB", "mk", "Settled at 1.00 · resolved from Tudum"]],
+      outcomes: [["Yes","77%"],["No","23%"]]
+    }
+  ];
+
+  var POSITIONS = [
+    ["Ash & Ember · #1 searched TV show", "56%", "63%", "$100", "+$12.50"],
+    ["Mara Oyelaran · #1 searched actor", "39%", "37%", "$50", "-$2.56"],
+    ["The Quiet Ward · Netflix #1 Aug 10", "44%", "100%", "$25", "+$31.81"]
+  ];
+
+  /* ---------------- sparkline ---------------- */
+  function spark(m, e) {
+    // scaled to this row's own range so the shape of the gap is legible,
+    // not to a shared axis where a 25-point move collapses into 8px
+    var W = 120, H = 38, n = m.length;
+    var all = m.concat(e), lo = Math.min.apply(null, all), hi = Math.max.apply(null, all);
+    var pad = Math.max(3, (hi - lo) * 0.12); lo -= pad; hi += pad;
+    function X(i) { return (i / (n - 1)) * (W - 4) + 2; }
+    function Y(v) { return H - 4 - ((v - lo) / (hi - lo)) * (H - 8); }
+    function d(a) { var s = ""; for (var i = 0; i < a.length; i++) s += (i ? "L" : "M") + X(i).toFixed(1) + " " + Y(a[i]).toFixed(1) + " "; return s; }
+    var area = d(m); for (var j = e.length - 1; j >= 0; j--) area += "L" + X(j).toFixed(1) + " " + Y(e[j]).toFixed(1) + " ";
+    return '<svg class="spark" viewBox="0 0 ' + W + ' ' + H + '" aria-hidden="true">'
+      + '<path d="' + area + 'Z" fill="var(--gap-fill)"/>'
+      + '<path d="' + d(m) + '" fill="none" stroke="var(--market)" stroke-width="1.5" stroke-linecap="round"/>'
+      + '<path d="' + d(e) + '" fill="none" stroke="var(--evidence)" stroke-width="1.5" stroke-linecap="round"/>'
+      + '<circle cx="' + X(n - 1).toFixed(1) + '" cy="' + Y(e[n - 1]).toFixed(1) + '" r="2.4" fill="var(--evidence)"/>'
+      + '<circle cx="' + X(n - 1).toFixed(1) + '" cy="' + Y(m[n - 1]).toFixed(1) + '" r="2.4" fill="var(--market)"/></svg>';
+  }
+
+  /* ---------------- feed ---------------- */
+  var filter = "all";
+  function drawFeed() {
+    var host = el("rows"); host.textContent = "";
+    var shown = MARKETS.filter(function (m) {
+      return filter === "all" || (filter === "flag" ? m.tone === "flag" : m.tone !== "flag");
+    });
+    shown.sort(function (a, b) { return b.score - a.score; });
+
+    shown.forEach(function (m) {
+      var b = document.createElement("button");
+      b.className = "row"; b.type = "button";
+      b.innerHTML =
+        '<span class="q"><span class="q-t">' + m.q + '</span>'
+        + '<span class="q-m"><span>' + m.venue + '</span><span>Vol ' + m.vol + '</span></span></span>'
+        + '<span class="hide-s">' + spark(m.market, m.evidence) + '</span>'
+        + '<span class="num r hide-s">' + m.market[m.market.length - 1] + '%</span>'
+        + '<span class="num r">' + m.evidence[m.evidence.length - 1] + '</span>'
+        + '<span class="r"><span class="pill ' + m.tone + '"><i class="dot"></i>' + m.score + ' · ' + m.verdict + '</span></span>';
+      b.addEventListener("click", function () { openDetail(m); });
+      host.appendChild(b);
+    });
+    el("n-flagged").textContent = MARKETS.filter(function (m) { return m.tone === "flag"; }).length;
+  }
+
+  el("filter").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-f]"); if (!b) return;
+    filter = b.dataset.f;
+    this.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+    drawFeed();
+  });
+
+  /* ---------------- chart ---------------- */
+  var W = 760, H = 240, PL = 44, PR = 54, PT = 16, PB = 28, YMIN = 20, YMAX = 100;
+  function X(i, n) { return PL + (i / (n - 1)) * (W - PL - PR); }
+  function Y(v) { return PT + (1 - (v - YMIN) / (YMAX - YMIN)) * (H - PT - PB); }
+  function lp(a, n) { var d = ""; for (var i = 0; i < a.length; i++) d += (i ? "L" : "M") + X(i, n).toFixed(1) + " " + Y(a[i]).toFixed(1) + " "; return d.trim(); }
+  function ap(a, b, n) { var d = lp(a, n) + " "; for (var j = b.length - 1; j >= 0; j--) d += "L" + X(j, n).toFixed(1) + " " + Y(b[j]).toFixed(1) + " "; return d + "Z"; }
+
+  (function grid() {
+    var g = el("g-grid");
+    [20, 40, 60, 80, 100].forEach(function (v) {
+      g.appendChild(mk("line", { x1: PL, x2: W - PR, y1: Y(v), y2: Y(v), class: "grid-line" }));
+      g.appendChild(mk("text", { x: PL - 10, y: Y(v) + 3.5, class: "axis-txt", "text-anchor": "end" }, v));
+    });
+    [0, 4, 8, 11, 14].forEach(function (i) {
+      g.appendChild(mk("text", { x: X(i, 15), y: H - 7, class: "axis-txt", "text-anchor": "middle" }, "Day " + i));
+    });
+  })();
+
+  var CUR = null, CURSTOP = 0;
+
+  function paint(upto, s) {
+    var m = CUR.market.slice(0, upto), e = CUR.evidence.slice(0, upto), n = CUR.market.length;
+    el("p-market").setAttribute("d", lp(m, n));
+    el("p-evidence").setAttribute("d", lp(e, n));
+    el("p-gap").setAttribute("d", ap(m, e, n));
+
+    var ends = el("g-ends"); ends.textContent = "";
+    var ex = X(upto - 1, n);
+    [[m, "market", true], [e, "evidence", false]].forEach(function (p) {
+      var v = p[0][p[0].length - 1], c = "var(--" + p[1] + ")";
+      ends.appendChild(mk("circle", { cx: ex, cy: Y(v), r: 5.5, fill: "var(--card)", stroke: c, "stroke-width": 2.5 }));
+      ends.appendChild(mk("text", { x: ex + 11, y: Y(v) + 4, class: "end-label", fill: c }, p[2] ? v + "%" : String(v)));
+    });
+
+    var fg = el("g-flag"); fg.textContent = "";
+    var fd = CUR.flagDay;
+    if (fd != null && upto - 1 >= fd) {
+      var fx = X(fd, n);
+      fg.appendChild(mk("line", { x1: fx, x2: fx, y1: PT, y2: H - PB, stroke: "var(--flag)", "stroke-width": 1, "stroke-dasharray": "3 4", opacity: ".55" }));
+      fg.appendChild(mk("text", { x: fx + 6, y: PT + 11, class: "axis-txt", fill: "var(--flag)" }, "flagged"));
+    }
+
+    var sc = s || CUR;
+    el("d-score").textContent = sc.score;
+    el("d-score").style.color = sc.tone === "flag" ? "var(--flag)" : "var(--ink)";
+    el("d-odds").textContent = m[m.length - 1] + "%";
+    el("d-ev").textContent = e[e.length - 1];
+    el("d-explain").textContent = sc.explain;
+    el("d-counter").textContent = sc.counter;
+    var pill = el("d-pill");
+    pill.className = "pill " + sc.tone;
+    pill.lastElementChild.textContent = sc.verdict;
+
+    el("t-market").textContent = m[m.length - 1] + "%";
+    el("t-ev").textContent = e[e.length - 1];
+    el("t-tr").textContent = "+" + Math.max(1, Math.round((e[e.length - 1] - e[0]) * 0.8)) + "%";
+    el("t-cor").textContent = sc.score + " / 100";
+  }
+
+  function openDetail(m) {
+    CUR = m;
+    el("d-venue").textContent = m.venue;
+    el("d-q").textContent = m.q;
+    el("d-vol").textContent = m.vol;
+
+    var sh = el("d-sources"); sh.textContent = "";
+    m.sources.forEach(function (s) {
+      var d = document.createElement("div");
+      d.className = "src";
+      d.innerHTML = '<div class="src-top"><i class="dot" style="background:var(--' + (s[1] === "mk" ? "market" : "evidence") + ')"></i>' + s[0] + '</div>'
+        + '<q>' + s[2] + '</q>';
+      sh.appendChild(d);
+    });
+
+    var host = el("stops"); host.textContent = "";
+    if (m.replay) {
+      el("stops").hidden = false; el("locked").hidden = true;
+      m.replay.forEach(function (s, i) {
+        var b = document.createElement("button");
+        b.className = "stop"; b.type = "button";
+        b.innerHTML = '<span class="stop-pin"></span><span class="stop-txt"><span class="stop-day">Day ' + s.day + '</span><br>' + s.label + '</span>';
+        b.addEventListener("click", function () { setStop(i); });
+        host.appendChild(b);
+      });
+      setStop(2);
+    } else {
+      el("stops").hidden = true; el("locked").hidden = false;
+      paint(m.market.length, null);
+    }
+
+    var oh = el("outcomes"); oh.textContent = ""; var chosen = 0;
+    m.outcomes.forEach(function (o, i) {
+      var b = document.createElement("button");
+      b.className = "outcome"; b.type = "button";
+      b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
+      b.innerHTML = o[0] + ' <span>' + o[1] + '</span>';
+      b.addEventListener("click", function () {
+        chosen = i;
+        oh.querySelectorAll(".outcome").forEach(function (x, j) { x.setAttribute("aria-pressed", j === i ? "true" : "false"); });
+        el("place").disabled = false; el("place").textContent = "Log paper position";
+        el("filled").classList.remove("on");
+      });
+      oh.appendChild(b);
+    });
+    el("place").disabled = false;
+    el("place").textContent = "Log paper position";
+    el("filled").classList.remove("on");
+    el("place").onclick = function () {
+      var o = m.outcomes[chosen];
+      this.disabled = true; this.textContent = "Position logged";
+      el("filled-txt").textContent = "$100 on " + o[0] + " at " + o[1] + " · paper only";
+      el("filled").classList.add("on");
+    };
+
+    show("detail");
+    window.scrollTo(0, 0);
+  }
+
+  function setStop(i) {
+    CURSTOP = i;
+    var s = CUR.replay[i];
+    paint(s.day + 1, s);
+    document.querySelectorAll(".stop").forEach(function (b, j) { b.setAttribute("aria-current", j === i ? "true" : "false"); });
+  }
+
+  /* ---------------- hover ---------------- */
+  (function () {
+    var svg = el("chart"), shell = svg.parentNode, tip = el("tip"), g = el("g-hover");
+    shell.addEventListener("pointerleave", function () { g.textContent = ""; tip.classList.remove("on"); });
+    shell.addEventListener("pointermove", function (ev) {
+      if (!CUR) return;
+      var r = svg.getBoundingClientRect(), n = CUR.market.length;
+      var upto = CUR.replay ? CUR.replay[CURSTOP].day + 1 : n;
+      var px = ((ev.clientX - r.left) / r.width) * W;
+      var i = Math.round(((px - PL) / (W - PL - PR)) * (n - 1));
+      i = Math.max(0, Math.min(upto - 1, i));
+
+      g.textContent = "";
+      var cx = X(i, n);
+      g.appendChild(mk("line", { x1: cx, x2: cx, y1: PT, y2: H - PB, stroke: "var(--hairline-2)", "stroke-width": 1 }));
+      g.appendChild(mk("circle", { cx: cx, cy: Y(CUR.market[i]), r: 4.5, fill: "var(--market)", stroke: "var(--card)", "stroke-width": 2 }));
+      g.appendChild(mk("circle", { cx: cx, cy: Y(CUR.evidence[i]), r: 4.5, fill: "var(--evidence)", stroke: "var(--card)", "stroke-width": 2 }));
+
+      el("tip-day").textContent = "Day " + i;
+      el("tip-m").textContent = CUR.market[i] + "%";
+      el("tip-e").textContent = CUR.evidence[i];
+      el("tip-g").textContent = (CUR.evidence[i] - CUR.market[i]) + " pts";
+      tip.classList.add("on");
+      var left = (cx / W) * r.width + 18;
+      if (left > r.width - 174) left = (cx / W) * r.width - 174;
+      tip.style.left = Math.max(0, left) + "px";
+      tip.style.top = Math.max(0, (Y(Math.max(CUR.market[i], CUR.evidence[i])) / H) * r.height - 12) + "px";
+    });
+  })();
+
+  /* ---------------- positions ---------------- */
+  (function () {
+    var host = el("pos-rows");
+    POSITIONS.forEach(function (p) {
+      var up = p[4].charAt(0) === "+";
+      var d = document.createElement("div");
+      d.className = "pos-row";
+      d.innerHTML = '<span class="q-t">' + p[0] + '</span>'
+        + '<span class="num hide-s">' + p[1] + '</span>'
+        + '<span class="num r hide-s">' + p[2] + '</span>'
+        + '<span class="num r">' + p[3] + '</span>'
+        + '<span class="num r ' + (up ? "up" : "down") + '">' + p[4] + '</span>';
+      host.appendChild(d);
+    });
+  })();
+
+  /* ---------------- routing ---------------- */
+  function show(v) {
+    ["feed", "detail", "positions"].forEach(function (k) { el("v-" + k).hidden = k !== v; });
+    document.querySelectorAll(".nav button").forEach(function (b) {
+      b.setAttribute("aria-current", b.dataset.go === v ? "true" : "false");
+    });
+  }
+  document.querySelectorAll("[data-go]").forEach(function (b) {
+    b.addEventListener("click", function () { show(b.dataset.go); window.scrollTo(0, 0); });
+  });
+
+  drawFeed();
+  show("feed");
+})();
+</script>

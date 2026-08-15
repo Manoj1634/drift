@@ -1,0 +1,18 @@
+{
+  "id": "what-will-be-the-top-us-netflix-show-this-week-20260812180419528",
+  "title": "What will be the top US Netflix show this week?",
+  "odds_by_show": {
+    "My Life With the Walter Boys: Season 3": 0.937,
+    "Conversations with a Killer: The Charles Manson Tapes: Season 1": 0.008,
+    "Tires: Season 3": 0.0615
+  },
+  "clob_token_ids": {
+    "My Life With the Walter Boys: Season 3": "108161353502575898743387451659522721782231489903550934105090675594464459109163",
+    "Conversations with a Killer: The Charles Manson Tapes: Season 1": "100992267133273708611004907456929719820921541708934438912316403465642621127989",
+    "Tires: Season 3": "61382075431818532206267724585337389081464100507288419111234125731914966094935"
+  },
+  "volume_24h": 37277.649199,
+  "end_date": "2026-08-18T23:59:00Z",
+  "timestamp": "2026-08-15T19:30:00Z",
+  "source": "polymarket"
+}
