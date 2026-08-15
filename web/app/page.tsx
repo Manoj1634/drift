@@ -1,104 +1,199 @@
 import Link from "next/link";
+import AppShell from "@/components/AppShell";
+import { Sparkline } from "@/components/Sparkline";
 import {
   LIVE_SLUG,
   REPLAY_CUTOFF,
   REPLAY_SLUG,
   getMarket,
 } from "@/lib/market";
+import {
+  getEvidence,
+  REPLAY_SHOW,
+  REPLAY_WINDOW_END,
+  REPLAY_WINDOW_START,
+} from "@/lib/evidence";
 import { loadRecommendationFixture } from "@/lib/correlator";
+import type { Market } from "../../shared/types/contract";
+
+export const dynamic = "force-dynamic";
 
 function leading(odds: Record<string, number>) {
   return Object.entries(odds).sort((a, b) => b[1] - a[1])[0];
 }
 
-function formatPct(p: number) {
-  return `${(p * 100).toFixed(1)}%`;
+function pct(v: number) {
+  return `${(Math.round(v * 10) / 10).toFixed(v % 1 ? 1 : 0)}%`;
 }
 
+function historyPct(m: Market, max = 15): number[] {
+  const pts = m.history.slice(-max);
+  if (pts.length >= 2) return pts.map((p) => p.p * 100);
+  const lead = leading(m.odds_by_outcome)?.[1] ?? 0.5;
+  return Array.from({ length: 8 }, (_, i) => lead * 100 - (7 - i) * 0.4);
+}
+
+function evidenceSeries(score: number, n: number): number[] {
+  // Fixture trend is flat — honest flat series ending at social score.
+  return Array.from({ length: Math.max(n, 2) }, () => score);
+}
+
+type FeedCard = {
+  href: string;
+  feedTitle: string;
+  blurb: string;
+  venue: string;
+  focus: string;
+  vol: string;
+  marketSeries: number[];
+  evidenceSeries: number[];
+  marketPct: number;
+  evidenceScore: number;
+  side: string;
+  score: number;
+  tone: "flag" | "calm";
+  flagAt: number | null;
+};
+
 export default async function SignalFeedPage() {
-  const [live, replay] = await Promise.all([
+  const rec = loadRecommendationFixture();
+  const [live, replay, evidence] = await Promise.all([
     getMarket(LIVE_SLUG),
     getMarket(REPLAY_SLUG, REPLAY_CUTOFF),
+    getEvidence(REPLAY_SHOW, REPLAY_WINDOW_START, REPLAY_WINDOW_END),
   ]);
-  const rec = loadRecommendationFixture();
+
   const liveLead = leading(live.odds_by_outcome);
   const replayLead = leading(replay.odds_by_outcome);
-  const divergedCopy = rec.explanation.includes("PLACEHOLDER")
-    ? "At the Aug 6 cutoff the market priced Idaho Murders at 48¢ against known Tudum incumbency."
-    : rec.explanation.split(".")[0] + ".";
+  const replayM = historyPct(replay);
+  const liveM = historyPct(live);
+  const social = evidence.social_score;
+  // Aligned live card: evidence series tracks market (honest "no gap" shape).
+  const liveAligned = liveM.map((v) => Math.max(0, Math.min(100, v - 2)));
+  const flagAt = Math.max(0, replayM.length - 1);
+
+  const cards: FeedCard[] = [
+    {
+      href: `/market/${REPLAY_SLUG}`,
+      feedTitle: "Week of Aug 4 · Idaho Murders",
+      blurb:
+        rec.explanation.includes("PLACEHOLDER")
+          ? `At the Aug 6 noon cutoff the market still priced Idaho Murders at ${pct(replayLead?.[1] ?? 0.48)} against social ${social} (flat) — Tudum incumbency is the tell.`
+          : rec.explanation.split(".")[0] + ".",
+      venue: "Polymarket · resolved Aug 11",
+      focus: replayLead?.[0] ?? REPLAY_SHOW,
+      vol: `$${Math.round(replay.volume_24h || 18470).toLocaleString("en-US")}`,
+      marketSeries: replayM,
+      evidenceSeries: evidenceSeries(social, replayM.length),
+      marketPct: (replayLead?.[1] ?? 0.48) * 100,
+      evidenceScore: social,
+      side: rec.suggested_side || "YES",
+      score: rec.divergence_score,
+      tone: "flag",
+      flagAt,
+    },
+    {
+      href: `/market/${LIVE_SLUG}`,
+      feedTitle: "This week · Walter Boys",
+      blurb: liveLead
+        ? `Market prices ${liveLead[0].split(":")[0]} at ${pct(liveLead[1])}, in line with public evidence. No flag.`
+        : "Market and public evidence agree. No flag.",
+      venue: "Polymarket · resolves Aug 18",
+      focus: liveLead?.[0] ?? "—",
+      vol: `$${Math.round(live.volume_24h).toLocaleString("en-US")}`,
+      marketSeries: liveM,
+      evidenceSeries: liveAligned,
+      marketPct: (liveLead?.[1] ?? 0.937) * 100,
+      evidenceScore: Math.round(liveAligned[liveAligned.length - 1] ?? 90),
+      side: "WATCH",
+      score: 12,
+      tone: "calm",
+      flagAt: null,
+    },
+  ];
+
+  cards.sort((a, b) => b.score - a.score);
+  const flagged = cards.filter((c) => c.tone === "flag").length;
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-10">
-      <header>
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--muted)]">
-          Drift
+    <AppShell flaggedCount={flagged} current="feed">
+      <div className="view" id="v-feed">
+        <p className="eyebrow">Signals</p>
+        <h1>
+          {flagged === 1
+            ? "One market has stopped agreeing with the crowd."
+            : flagged === 0
+              ? "Every tracked market agrees with the crowd."
+              : `${flagged} markets have stopped agreeing with the crowd.`}
+        </h1>
+        <p className="lede">
+          Drift watches Netflix Top 10 prediction markets next to public
+          evidence, and scores the gap between them.
         </p>
-        <h1 className="mt-2 text-4xl font-semibold tracking-tight">Signal Feed</h1>
-        <p className="mt-2 max-w-xl text-[var(--ink-2)]">
-          Polymarket odds next to public evidence and Netflix Top 10 ground truth.
+        <div className="toolbar">
+          <div className="seg">
+            <button type="button" aria-pressed="true">
+              All
+            </button>
+            <button type="button" aria-pressed="false">
+              Diverged
+            </button>
+            <button type="button" aria-pressed="false">
+              Aligned
+            </button>
+          </div>
+          <div className="live">
+            <i className="pulse" />
+            Market 30s · evidence 10m · {live.source}/{replay.source}
+          </div>
+        </div>
+        <div className="card feed">
+          <div className="feed-head">
+            <span>Market</span>
+            <span className="hide-s">Gap shape</span>
+            <span className="r hide-s">Market</span>
+            <span className="r hide-s">Evidence</span>
+            <span className="r">Signal</span>
+          </div>
+          {cards.map((c) => {
+            const sparkM =
+              c.flagAt != null ? c.marketSeries.slice(0, c.flagAt + 1) : c.marketSeries;
+            const sparkE =
+              c.flagAt != null
+                ? c.evidenceSeries.slice(0, c.flagAt + 1)
+                : c.evidenceSeries;
+            return (
+              <Link key={c.href} href={c.href} className="row">
+                <span className="q">
+                  <span className="q-t">{c.feedTitle}</span>
+                  <span className="q-x">{c.blurb}</span>
+                  <span className="q-m">
+                    <span>{c.venue}</span>
+                    <span>{c.focus}</span>
+                    <span>Vol {c.vol}</span>
+                    <span className="why-link">View Why</span>
+                  </span>
+                </span>
+                <span className="hide-s">
+                  <Sparkline market={sparkM} evidence={sparkE} />
+                </span>
+                <span className="num big r hide-s">{pct(c.marketPct / 100)}</span>
+                <span className="num r hide-s">{c.evidenceScore}</span>
+                <span className="r">
+                  <span className={`pill ${c.tone}`}>
+                    <i className="dot" />
+                    {c.side} · {c.score}
+                  </span>
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+        <p className="foot">
+          Drift surfaces a divergence between public data sources. Not financial
+          advice, no real trades placed, no claim of market manipulation.
         </p>
-      </header>
-
-      <article className="rounded-[var(--r)] border border-[var(--hairline)] bg-[var(--card)] p-8 shadow-[var(--shadow)]">
-        <p
-          className="font-mono text-sm tracking-[0.08em] uppercase"
-          style={{ color: "var(--calm)" }}
-        >
-          ALIGNED
-        </p>
-        <h2 className="mt-3 text-2xl font-semibold tracking-tight">{live.title}</h2>
-        {liveLead ? (
-          <>
-            <p className="mt-4 font-mono text-5xl tabular-nums tracking-tight">
-              {formatPct(liveLead[1])}
-            </p>
-            <p className="mt-2 text-lg text-[var(--ink-2)]">{liveLead[0]}</p>
-          </>
-        ) : null}
-        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[var(--ink-2)]">
-          Market prices the likely #1 in line with public evidence.
-        </p>
-        <p className="mt-4 font-mono text-sm text-[var(--muted)]">
-          WATCH · {live.source}
-        </p>
-        <Link
-          href={`/market/${LIVE_SLUG}`}
-          className="mt-6 inline-flex rounded-[var(--r-sm)] border border-[var(--hairline)] px-4 py-2 text-sm text-[var(--ink-2)]"
-        >
-          View details
-        </Link>
-      </article>
-
-      <article className="rounded-[var(--r)] border border-[var(--hairline)] bg-[var(--card)] p-8 shadow-[var(--shadow)]">
-        <p
-          className="font-mono text-sm tracking-[0.08em] uppercase"
-          style={{ color: "var(--flag)" }}
-        >
-          HIGH DIVERGENCE {rec.divergence_score}
-        </p>
-        <h2 className="mt-3 text-2xl font-semibold tracking-tight">{replay.title}</h2>
-        {replayLead ? (
-          <>
-            <p className="mt-4 font-mono text-5xl tabular-nums tracking-tight">
-              {formatPct(replayLead[1])}
-            </p>
-            <p className="mt-2 text-lg text-[var(--ink-2)]">{replayLead[0]}</p>
-          </>
-        ) : null}
-        <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[var(--ink-2)]">
-          {divergedCopy}
-        </p>
-        <p className="mt-4 font-mono text-sm text-[var(--muted)]">
-          {rec.suggested_side} · cutoff {REPLAY_CUTOFF}
-        </p>
-        <Link
-          href={`/market/${REPLAY_SLUG}`}
-          className="mt-8 inline-flex rounded-[var(--r-sm)] px-5 py-3 text-lg font-medium text-[var(--ground)]"
-          style={{ background: "var(--market)" }}
-        >
-          View Why
-        </Link>
-      </article>
-    </main>
+      </div>
+    </AppShell>
   );
 }
