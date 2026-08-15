@@ -20,6 +20,15 @@ AGENTS.md contracts — nothing in the shared schema changes.
 
 ---
 
+## THE use case (locked — verified live on Gamma API, Aug 15 2026)
+
+One question, one screen, one story: **"Is the market pricing Netflix's #1 US show correctly, relative to public evidence?"**
+
+- **Live market**: `what-will-be-the-top-us-netflix-show-this-week-20260812180419528` — resolves Aug 18. Current odds: *My Life With the Walter Boys S3* **93.6%**, *Tires S3* **6%**. This is the Signal Feed / Investigation screen.
+- **Replay week**: `what-will-be-the-top-us-netflix-show-this-week-20260805154446618` — resolved Aug 11, winner ***The Idaho Murders: College Nightmare*** (a true-crime surprise — ideal chatter-led story). P1 pulls its CLOB price history; P2 runs Grok X/Web search over Aug 5–11 to show chatter rising before the market repriced; P3 caches the official Tudum result as the reveal.
+
+Every agent, fixture, and Grok prompt uses these two markets. Nothing else.
+
 ## Prerequisites — do these in the first 15 minutes, together
 
 1. **Funded xAI key** → confirm one `chat.completions` call and one X/Web-search call actually succeed. Put it in `.env` as `XAI_API_KEY`. *(Single biggest risk — test it before anything else.)*
