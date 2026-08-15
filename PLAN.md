@@ -1,5 +1,5 @@
 ---
-name: Water Cooler build plan (v2 — 4 people, wall clock)
+name: Drift build plan (v2 — 4 people, wall clock)
 overview: Four vertical tracks against one frozen contract. Live divergence on a Google-searched market, replay on a hand-typed Netflix week. Grok does the reasoning; Cursor SDK is stretch, not scope.
 todos:
   - id: lock
@@ -29,7 +29,7 @@ todos:
 isProject: false
 ---
 
-# Water Cooler — build plan v2
+# Drift — build plan v2
 
 **Assume now = 11:45. Submissions close 3:00. You have ~1h45m of build.**
 

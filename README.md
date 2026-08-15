@@ -1,6 +1,6 @@
-# Water Cooler
+# Drift
 
-**Does the market agree with the crowd — and with what actually happened?**
+**Prediction markets tell you what people will bet. The internet tells you what people are starting to believe. Drift flags the moment those two separate.**
 
 Built at the Cursor Austin Grok 4.6 Hackathon, Aug 15, 2026. Path: Agentic Orchestration.
 
@@ -8,7 +8,7 @@ Built at the Cursor Austin Grok 4.6 Hackathon, Aug 15, 2026. Path: Agentic Orche
 
 ## The problem
 
-Prediction markets run bets on "which Netflix show is #1" — and they resolve against Netflix's own official Top 10. But there's no quick way to see, in the moment, whether the market's odds and the online chatter about a show actually agree with each other, or whether one is calling something the other missed. Water Cooler watches both and tells you the moment they stop agreeing.
+Prediction markets run bets on "which Netflix show is #1" — and they resolve against Netflix's own official Top 10. But there's no quick way to see, in the moment, whether the market's odds and the online chatter about a show actually agree with each other, or whether one is calling something the other missed. Drift watches both and tells you the moment they stop agreeing.
 
 ## How it works
 
@@ -34,7 +34,7 @@ Full architecture, data contracts, and cadences: see [`CONTEXT.md`](./CONTEXT.md
 
 ```bash
 git clone <repo-url>
-cd water-cooler
+cd drift
 cp .env.example .env   # fill in API keys — see CONTEXT.md for which ones are required vs optional
 
 # backend

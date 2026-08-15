@@ -1,8 +1,8 @@
-# Water Cooler — Docs
+# Drift — Docs
 
-Hackathon docs for Water Cooler, an AI prediction-market signal analyst.
+Hackathon docs for Drift, an AI prediction-market signal analyst.
 
-**One-liner:** Prediction markets tell you what people will bet. The internet tells you what people are beginning to believe. Water Cooler flags the moment those two stories stop matching.
+**One-liner:** Prediction markets tell you what people will bet. The internet tells you what people are starting to believe. Drift flags the moment those two separate.
 
 ## The three that are canonical (repo root)
 

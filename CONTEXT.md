@@ -1,4 +1,4 @@
-# CONTEXT.md — Water Cooler Source of Truth
+# CONTEXT.md — Drift Source of Truth
 
 Canonical for **product decisions, non-goals, and the decisions log**. If something here conflicts with a Slack message or a verbal decision, **this file wins**; update it, don't work around it.
 
@@ -8,7 +8,7 @@ Not canonical for everything: [AGENTS.md](AGENTS.md) (repo root) owns the **data
 
 ## Product Vision
 
-The internet already signals what's about to be popular before the official numbers confirm it — it shows up in what people bet on and what they won't stop talking about. Water Cooler makes that visible: it watches a prediction market and the cultural conversation feeding it side by side, and calls out the exact moment they stop agreeing — with each other, or with what actually happened.
+The internet already signals what's about to be popular before the official numbers confirm it — it shows up in what people bet on and what they won't stop talking about. Drift makes that visible: it watches a prediction market and the cultural conversation feeding it side by side, and calls out the exact moment they stop agreeing — with each other, or with what actually happened.
 
 ## Problem Statement
 

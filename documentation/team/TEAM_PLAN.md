@@ -1,4 +1,4 @@
-# Water Cooler — 4-Person / 3-Hour Team Plan
+# Drift — 4-Person / 3-Hour Team Plan
 
 ## Working Principle
 

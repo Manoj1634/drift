@@ -1,4 +1,4 @@
-# Water Cooler — Architecture
+# Drift — Architecture
 
 ## System
 
@@ -118,7 +118,7 @@ Output:
 ## Suggested Repo Layout
 
 ```text
-water-cooler/
+drift/
 ├── README.md
 ├── CONTEXT.md
 ├── AGENTS.md

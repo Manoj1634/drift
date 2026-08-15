@@ -1,4 +1,4 @@
-# Water Cooler
+# Drift
 
 **Watch a prediction market. Watch the conversation around it. Flag the moment they stop agreeing.**
 

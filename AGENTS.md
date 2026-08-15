@@ -6,7 +6,7 @@ If you change the contract below, change it here first and tell the other three 
 
 ## Product Vision
 
-Water Cooler is an **AI prediction-market signal analyst**.
+Drift is an **AI prediction-market signal analyst**.
 
 It watches prediction-market pricing and compares it with public evidence from social conversation, web/news signals, and an official/historical outcome source. Grok reasons across those inputs and surfaces moments where the market and the outside evidence diverge.
 
@@ -87,7 +87,7 @@ Do **not** build a full watchlist product during the hackathon.
 
 ## Killer Feature — Historical Replay
 
-The replay demonstrates what Water Cooler would have seen at a prior point in time before the official outcome was known.
+The replay demonstrates what Drift would have seen at a prior point in time before the official outcome was known.
 
 The replay must use real historical data where possible. Do not fabricate percentages or timestamps and present them as real.
 
@@ -98,7 +98,7 @@ Earlier in week:
 Market odds relatively low / flat
 External evidence strengthening
         ↓
-Water Cooler flags divergence
+Drift flags divergence
         ↓
 Market reprices later
         ↓

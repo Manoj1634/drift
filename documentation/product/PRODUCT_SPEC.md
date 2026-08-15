@@ -1,10 +1,10 @@
-# Water Cooler — Product Spec
+# Drift — Product Spec
 
 ## Problem
 
 Prediction-market traders can see market odds, social chatter, news, and outcome data, but they must mentally connect those signals themselves.
 
-Water Cooler turns that fragmented research process into one explainable signal.
+Drift turns that fragmented research process into one explainable signal.
 
 ## User
 
@@ -68,7 +68,7 @@ Returns:
 Lets the user view a prior point in time and see:
 - what the market priced
 - what external evidence indicated
-- when Water Cooler would have flagged divergence
+- when Drift would have flagged divergence
 - what happened afterward
 
 ## Screens
@@ -117,4 +117,4 @@ A judge can:
 4. understand Grok's reasoning
 5. see a counterargument
 6. replay a historical example
-7. explain Water Cooler back in one sentence
+7. explain Drift back in one sentence

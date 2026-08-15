@@ -1,4 +1,4 @@
-# Water Cooler — Judging Strategy
+# Drift — Judging Strategy
 
 ## Rubric
 
@@ -72,7 +72,7 @@ Market Probability: 62%
 
 External signals: rising
 
-Water Cooler:
+Drift:
 HIGH DIVERGENCE
 78 / 100
 ```
