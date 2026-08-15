@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import AppShell from "@/components/AppShell";
+import DriftShell from "@/components/DriftShell";
+import BetDesk from "@/components/BetDesk";
 import InvestigationBoard, {
   type ReplayStop,
 } from "@/components/InvestigationBoard";
 import PaperTicket from "@/components/PaperTicket";
+import { loadFeed, pendingRow } from "@/lib/feed";
 import {
   correlate,
   loadCultureFixture,
@@ -247,7 +250,13 @@ export default async function InvestigationPage({
   params,
 }: PageProps<"/market/[slug]">) {
   const { slug } = await params;
-  if (slug !== LIVE_SLUG && slug !== REPLAY_SLUG) notFound();
+  if (slug !== LIVE_SLUG && slug !== REPLAY_SLUG) {
+    const feed = await loadFeed();
+    if (!feed.rows.some((r) => r.slug === slug)) {
+      feed.rows = [pendingRow(slug), ...feed.rows];
+    }
+    return <DriftShell initial={feed} initialSlug={slug} />;
+  }
 
   const asOf = slug === REPLAY_SLUG ? REPLAY_CUTOFF : undefined;
   const cultureFallback = loadCultureFixture();
@@ -376,22 +385,14 @@ export default async function InvestigationPage({
           ← All signals
         </Link>
 
-        <InvestigationBoard
+        <BetDesk
           title={market.title}
           venue={venue}
           volumeLabel={vol}
-          ranks={ranks}
           marketSeries={mSeries}
           evidenceSeries={eSeries}
           labels={labels}
-          flagAt={replayBuilt.flagAt}
-          stops={replayBuilt.stops}
-          locked={!isReplay}
-          liveScore={rec.divergence_score}
-          liveConfidence={rec.confidence}
-          liveSide={rec.suggested_side}
-          liveTone={tone}
-          initialStop={replayBuilt.initialStop}
+          outcomes={outcomes}
         />
 
         <section className="card trail">
@@ -526,12 +527,30 @@ export default async function InvestigationPage({
           </div>
         </section>
 
+        <InvestigationBoard
+          hideChart
+          title={market.title}
+          venue={venue}
+          volumeLabel={vol}
+          ranks={ranks}
+          marketSeries={mSeries}
+          evidenceSeries={eSeries}
+          labels={labels}
+          flagAt={replayBuilt.flagAt}
+          stops={replayBuilt.stops}
+          locked={!isReplay}
+          liveScore={rec.divergence_score}
+          liveConfidence={rec.confidence}
+          liveSide={rec.suggested_side}
+          liveTone={tone}
+          initialStop={replayBuilt.initialStop}
+        />
+
         <PaperTicket outcomes={outcomes} />
 
         <p className="foot">
-          Drift surfaces a divergence between public data sources. Not financial
-          advice, no real trades placed, no claim of market manipulation. as of{" "}
-          {rec.as_of}
+          Paper only. No real trades. No claim of
+          market manipulation. as of {rec.as_of}
         </p>
       </div>
     </AppShell>

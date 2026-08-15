@@ -75,7 +75,7 @@ export function MarketChart({
             strokeDasharray="4 4"
           />
           <text x={cutX + 6} y={18} fill="#8b8b8b" fontSize="10">
-            Water Cooler flag — Aug 6, 12:00 UTC
+            Drift flag — Aug 6, 12:00 UTC
           </text>
         </>
       ) : null}

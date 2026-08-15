@@ -10,6 +10,12 @@ import type {
 } from "../../shared/types/contract";
 import { RECOMMENDATION_KEYS } from "../../shared/types/contract";
 import {
+  getEvidence,
+  REPLAY_SHOW,
+  REPLAY_WINDOW_END,
+  REPLAY_WINDOW_START,
+} from "./evidence";
+import {
   REPLAY_CUTOFF,
   REPLAY_SLUG,
   getMarket,
@@ -334,7 +340,17 @@ export async function correlateForSlug(
 ): Promise<CorrelateResult> {
   const cutoff = asOf ?? (slug === REPLAY_SLUG ? REPLAY_CUTOFF : undefined);
   const market = await getMarket(slug, cutoff);
-  const evidence = loadEvidenceFixture();
+  const lead =
+    Object.entries(market.odds_by_outcome).sort((a, b) => b[1] - a[1])[0]?.[0] ??
+    REPLAY_SHOW;
+  const evidence =
+    slug === REPLAY_SLUG
+      ? await getEvidence(REPLAY_SHOW, REPLAY_WINDOW_START, REPLAY_WINDOW_END)
+      : await getEvidence(
+          lead,
+          new Date(Date.now() - 3 * 864e5).toISOString(),
+          new Date().toISOString(),
+        );
   const culture = loadCultureFixture();
   return correlate(market, evidence, culture, cutoff);
 }

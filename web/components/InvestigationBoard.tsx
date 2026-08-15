@@ -32,6 +32,7 @@ type Props = {
   liveSide: string;
   liveTone: "flag" | "calm" | "mute";
   initialStop?: number;
+  hideChart?: boolean;
 };
 
 export default function InvestigationBoard({
@@ -50,6 +51,7 @@ export default function InvestigationBoard({
   liveSide,
   liveTone,
   initialStop = 2,
+  hideChart = false,
 }: Props) {
   const start = locked
     ? 0
@@ -82,6 +84,7 @@ export default function InvestigationBoard({
 
   return (
     <>
+      {hideChart ? null : (
       <section className="card hero" style={{ marginTop: 0 }}>
         <div className="hero-head">
           <div className="hero-title">
@@ -127,6 +130,7 @@ export default function InvestigationBoard({
           labels={(labels ?? []).filter(([i]) => i < upto)}
         />
       </section>
+      )}
 
       <section className="card replay" id="replay">
         <div className="replay-head">
