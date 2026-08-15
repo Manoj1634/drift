@@ -28,6 +28,8 @@
                   Frontend
 ```
 
+> **Contract note:** the per-component JSON below predates the multi-outcome fix and still uses `yes_price`/`no_price`. The live contract is in [AGENTS.md](../../AGENTS.md). Build against that; read this for the component split only.
+
 ## Component Responsibilities
 
 ### Market Pulse

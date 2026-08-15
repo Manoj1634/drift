@@ -1,6 +1,8 @@
 # AGENTS.md — Cursor / Grok Working Context
 
-This file is the canonical source of truth for the Water Cooler hackathon repo. If another document, message, or verbal decision conflicts with this file, update this file first.
+Canonical for **architecture, the data contract, and ownership**. [CONTEXT.md](CONTEXT.md) is canonical for **product decisions, non-goals, and the decisions log**. [PLAN.md](PLAN.md) is canonical for **the build clock**. Nothing else claims authority — if a doc under `documentation/` conflicts with one of these three, these three win.
+
+If you change the contract below, change it here first and tell the other three owners in the same breath.
 
 ## Product Vision
 
@@ -148,41 +150,42 @@ Do not hardcode a rule such as `if social > market then BUY` and use Grok only t
   "market": {
     "id": "string",
     "title": "string",
-    "yes_price": 0.62,
-    "no_price": 0.38,
-    "history": [],
+    "odds_by_outcome": {"Outcome A": 0.41, "Outcome B": 0.22},
+    "history": [{"t": "ISO8601", "odds_by_outcome": {}}],
     "volume_24h": 0,
     "timestamp": "ISO8601"
   },
   "evidence": {
-    "social_score": 0,
-    "web_score": 0,
+    "scores_by_outcome": {"Outcome A": 71, "Outcome B": 88},
     "trend": "rising",
-    "top_sources": [],
     "snippets": [],
+    "sources": [],
+    "source": "x_search|pytrends",
     "timestamp": "ISO8601"
   },
-  "culture": {
-    "current_rank": null,
-    "previous_rank": null,
-    "history": [],
-    "score": 0,
-    "source": "netflix_tudum"
+  "truth": {
+    "week_of": "YYYY-MM-DD",
+    "official_rank": [],
+    "source": "netflix_tudum|google_trends"
   },
-  "recommendation": {
-    "verdict": "diverged",
-    "suggested_side": "YES",
+  "signal": {
+    "verdict": "aligned|diverged",
     "divergence_score": 0,
-    "confidence": 0,
     "explanation": "",
-    "supporting_reasons": [],
     "counterargument": "",
-    "sources": []
+    "sources": [],
+    "flagged": false
   }
 }
 ```
 
 Do not silently change this contract.
+
+**Why `odds_by_outcome` and not `yes_price`/`no_price`:** most of the markets on the shortlist (`#1 Searched TV Show / Actor / Athlete on Google 2026`) are multi-outcome races, not binaries. A two-field price can't represent them. This shape handles binaries too — a binary is just two outcomes.
+
+`counterargument` is not optional. Grok returns the strongest case that the gap is noise, in the same structured call. It costs nothing and it is the difference between an analyst and a hype machine.
+
+A complete, hand-written instance of this contract lives at `shared/fixtures/demo.json` and exists **before** any integration works. Every track builds against that file so nobody is blocked on anybody.
 
 ## Team Ownership
 
@@ -250,7 +253,7 @@ No new features. Run the demo repeatedly, fix blockers, prepare recording.
 - Counterargument
 - Source evidence
 - Historical replay
-- Reliable 5-minute demo
+- Reliable 3-minute demo (hard submission cap)
 
 ## Stretch Only
 

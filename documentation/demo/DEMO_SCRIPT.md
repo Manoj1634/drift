@@ -1,110 +1,66 @@
-# Water Cooler — 5-Minute Demo Script
+# Water Cooler — 3-Minute Demo Script
+
+**Hard cap: 3:00.** The submission form rejects longer. This script runs ~2:40 and leaves 20s of slack.
+
+Record against the frozen snapshot in `fixtures/demo/`, not live APIs. You should be able to re-record five times and get the identical divergence every time.
 
 ## Goal
 
 The judge should remember one moment:
 
-> The market and public evidence disagreed. Grok caught the gap, explained it, and the historical replay showed why that kind of signal could matter.
+> The market and the public evidence disagreed. Grok caught the gap, explained it, argued the other side, and the replay showed the same signal appearing before the answer was known.
 
 ---
 
-## 0:00–0:30 — Problem
+## 0:00–0:20 — Problem
 
-Say:
+> Prediction markets tell you what people are willing to bet. The internet tells you what people are beginning to believe. Traders connect those by hand. Water Cooler does it automatically.
 
-> Prediction markets tell you what people are willing to bet. X and the web tell you what people are beginning to believe. But traders still have to connect those signals manually. Water Cooler does that automatically.
-
-Show the Signal Feed.
+Show the screen with the hero market already on it. Don't narrate the UI.
 
 ---
 
-## 0:30–1:00 — Reveal the Signal
+## 0:20–1:20 — The divergence, and Why
 
-Open the Netflix recommendation.
+> Here's what the market is pricing. Here's what the public evidence says. Water Cooler scores the gap.
 
-Say:
+Show: probability chart · divergence score · `HIGH DIVERGENCE`.
 
-> Here is the market's current probability. Water Cooler is seeing a different story in the public evidence.
+Click **Why?**
 
-Show:
-- market probability
-- divergence score
-- `HIGH DIVERGENCE`
+> Grok compares the signals — it isn't applying a hardcoded threshold. It says what agrees, what conflicts, and — this part matters — the strongest case that it's wrong.
 
-This is the first wow moment.
+Show: explanation · **counterargument** · sources with real snippets.
 
----
-
-## 1:00–2:00 — Show the Agents
-
-Show the agent status / evidence panel.
-
-Narrate:
-
-> The Market Pulse reads Polymarket pricing and history. The Evidence Scout uses Grok to search X and the web. The Truth & History agent checks Netflix ranking momentum.
-
-Show:
-- market signal
-- social signal
-- web signal
-- Netflix signal
+This is the wow moment. Get here by 0:30 or the video is mis-paced.
 
 ---
 
-## 2:00–3:00 — Grok Reasoning
+## 1:20–2:20 — Replay
 
-Show the explanation prominently.
+Click **Replay Last Week**.
 
-Say:
+> A signal after the fact is easy. The real question is whether it showed up before the answer was obvious.
 
-> Grok compares those signals instead of applying a hardcoded rule. It tells us what agrees, what conflicts, why the gap matters, and what could make the signal wrong.
+Scrub through: market odds flat → evidence strengthening → Water Cooler flags → market reprices → official outcome.
 
-Show:
-- divergence score
-- explanation
-- supporting reasons
-- counterargument
-- sources
+Real historical values only. Never present a fabricated number as real.
 
 ---
 
-## 3:00–4:00 — Historical Replay
+## 2:20–2:40 — Close
 
-Click:
+> We demonstrated this vertical because it has a clean market, a live public conversation, and an official outcome to check against. The architecture is the same for sports, politics, anything with a market and a crowd.
 
-`Replay Last Week`
-
-Say:
-
-> A recommendation is easy to generate. The better question is whether this type of signal could have appeared before the answer was obvious.
-
-Replay:
-1. market odds at the earlier point
-2. external evidence strengthening
-3. Water Cooler divergence flag
-4. later market repricing
-5. official historical outcome
-
-Only use real historical values for anything presented as factual.
+> Water Cooler doesn't promise a winning trade. It shows you when the market and the world are telling different stories — while that difference still exists.
 
 ---
 
-## 4:00–4:30 — Trust / Sources
+## Cut from the 5-minute version
 
-Show the source drawer.
+Kept out on purpose, not forgotten: the agent-status walkthrough ("Market Pulse reads Polymarket, Evidence Scout searches X..."), the standalone source-drawer segment, and per-agent signal narration. The architecture shows through the output. Narrating it costs 90 seconds and adds nothing a judge scores.
 
-Say:
+## Claims discipline
 
-> Every recommendation is inspectable. The user can see exactly which market data, social evidence, web evidence, and Netflix data contributed to the signal.
-
----
-
-## 4:30–5:00 — Close
-
-Say:
-
-> Today we demonstrated Netflix because it gives us a clean market, public conversation, and official outcome source. The same architecture extends to sports, politics, entertainment, and other prediction markets.
-
-Final line:
-
-> Water Cooler doesn't promise a winning trade. It shows you when the market and the world are telling different stories — before that difference disappears.
+Say: divergence signal · evidence gap · potential mismatch.
+Never say: guaranteed profit · manipulation detected · the market is wrong.

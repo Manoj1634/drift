@@ -1,8 +1,8 @@
 # CONTEXT.md — Water Cooler Source of Truth
 
-This is the canonical reference for this repo — for the team, and for Cursor/Grok while working in this codebase. If something here conflicts with a Slack message or a verbal decision, **this file wins**; update it, don't work around it.
+Canonical for **product decisions, non-goals, and the decisions log**. If something here conflicts with a Slack message or a verbal decision, **this file wins**; update it, don't work around it.
 
-> Tip: if Cursor doesn't pick this up as ambient context automatically, also save a copy as `AGENTS.md` at repo root — that's the emerging convention agentic coding tools auto-read.
+Not canonical for everything: [AGENTS.md](AGENTS.md) (repo root) owns the **data contract and architecture**, and [PLAN.md](PLAN.md) owns the **build clock**. The contract below is kept only as background — **build against AGENTS.md**, which handles multi-outcome markets. Where the two differ, AGENTS.md is right.
 
 ---
 
@@ -52,7 +52,7 @@ flowchart LR
 
 ## Data Contracts
 
-All four components speak these shapes. Don't change a field without updating this doc and telling whoever consumes it.
+> **Superseded.** The live contract is in [AGENTS.md](AGENTS.md) — it handles multi-outcome markets, which these shapes do not. The shapes below are kept for context on where the fields came from. Do not build against them.
 
 **Market Watcher output:**
 ```json
