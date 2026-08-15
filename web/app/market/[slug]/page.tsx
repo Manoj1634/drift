@@ -66,6 +66,50 @@ function displayText(value: string, fallback: string) {
   return value;
 }
 
+function nearestPoint(history: PricePoint[], iso: string): PricePoint | null {
+  if (!history.length) return null;
+  const t = Date.parse(iso);
+  let best = history[0]!;
+  let bestD = Math.abs(Date.parse(best.t) - t);
+  for (let i = 1; i < history.length; i++) {
+    const pt = history[i]!;
+    const d = Math.abs(Date.parse(pt.t) - t);
+    if (d < bestD) {
+      best = pt;
+      bestD = d;
+    }
+  }
+  return best;
+}
+
+/** Keep demo keyframes (cutoff → reprice → resolve) instead of uniform downsample. */
+function sampleForReplay(history: PricePoint[]): PricePoint[] {
+  if (history.length <= 18) return history;
+  const keys = [
+    "2026-08-06T02:00:00Z",
+    "2026-08-06T06:00:00Z",
+    "2026-08-06T10:00:00Z",
+    "2026-08-06T12:00:00Z",
+    "2026-08-06T14:00:00Z",
+    "2026-08-06T16:00:00Z",
+    "2026-08-07T00:00:00Z",
+    "2026-08-08T00:00:00Z",
+    "2026-08-09T00:00:00Z",
+    "2026-08-10T00:00:00Z",
+    "2026-08-11T12:00:00Z",
+  ];
+  const picked = new Map<string, PricePoint>();
+  for (const key of keys) {
+    const pt = nearestPoint(history, key);
+    if (pt) picked.set(pt.t, pt);
+  }
+  const last = history[history.length - 1];
+  if (last) picked.set(last.t, last);
+  return [...picked.values()].sort(
+    (a, b) => Date.parse(a.t) - Date.parse(b.t),
+  );
+}
+
 function downsample(history: PricePoint[], max = 16): PricePoint[] {
   if (history.length <= max) return history;
   const out: PricePoint[] = [];
@@ -85,8 +129,8 @@ function indexAtOrBefore(history: PricePoint[], iso: string): number {
   return idx;
 }
 
-function buildSeries(history: PricePoint[], social: number) {
-  const pts = downsample(history);
+function buildSeries(history: PricePoint[], social: number, replay: boolean) {
+  const pts = replay ? sampleForReplay(history) : downsample(history);
   const market = pts.map((p) => p.p * 100);
   // Honest flat evidence line ending at fixture/live social score.
   const evidence = pts.map(() => social);
@@ -94,8 +138,12 @@ function buildSeries(history: PricePoint[], social: number) {
   if (pts.length >= 2) {
     labels.push([0, fmtDay(pts[0]!.t)]);
     labels.push([pts.length - 1, fmtDay(pts[pts.length - 1]!.t)]);
-    const mid = Math.floor(pts.length / 2);
-    labels.push([mid, fmtDay(pts[mid]!.t)]);
+    const noon = indexAtOrBefore(pts, REPLAY_CUTOFF);
+    if (noon > 0 && noon < pts.length - 1) {
+      labels.push([noon, "Aug 6 noon"]);
+    } else {
+      labels.push([Math.floor(pts.length / 2), fmtDay(pts[Math.floor(pts.length / 2)]!.t)]);
+    }
   }
   return { market, evidence, labels, pts };
 }
@@ -111,11 +159,10 @@ function fmtDay(iso: string) {
 }
 
 function buildReplayStops(
-  history: PricePoint[],
+  pts: PricePoint[],
   social: number,
   rec: CorrelateResult,
 ): { stops: ReplayStop[]; flagAt: number; initialStop: number } {
-  const pts = downsample(history);
   const n = pts.length;
   const i2am = indexAtOrBefore(pts, "2026-08-06T02:00:00Z");
   const i10 = indexAtOrBefore(pts, "2026-08-06T10:00:00Z");
@@ -124,12 +171,22 @@ function buildReplayStops(
 
   const mAt = (i: number) => (pts[i]?.p ?? 0.48) * 100;
   const gap = (i: number) => Math.round(Math.abs(social - mAt(i)));
+  // Exclusive end index; keep stops non-decreasing for the scrubber.
+  const atOf = (...idxs: number[]) => {
+    let prev = 0;
+    return idxs.map((i) => {
+      const at = Math.min(n, Math.max(i + 1, prev + 1));
+      prev = at;
+      return at;
+    });
+  };
+  const [at2, at10, atNoon, at4] = atOf(i2am, i10, iNoon, i4pm);
 
   const stops: ReplayStop[] = [
     {
       when: "Aug 6 2am",
       label: "Market still unsure",
-      at: Math.max(2, i2am + 1),
+      at: at2,
       score: Math.min(30, gap(i2am)),
       confidence: 40,
       side: "WATCH",
@@ -139,17 +196,17 @@ function buildReplayStops(
     {
       when: "Aug 6 10am",
       label: "Evidence pulls ahead",
-      at: Math.max(3, i10 + 1),
-      score: Math.max(35, gap(i10) - 5),
+      at: at10,
+      score: Math.max(35, Math.min(55, gap(i10) + 10)),
       confidence: 55,
       side: "WATCH",
       tone: "mute",
-      explain: `Evidence sits at ${social} while the market is still near ${Math.round(mAt(i10))}%. The gap is widening in one direction.`,
+      explain: `Evidence sits at ${social} while the market is still near ${Math.round(mAt(i10))}%. The gap is widening in one direction — the pattern that usually precedes a flag.`,
     },
     {
       when: "Aug 6 noon",
       label: "Drift flags it",
-      at: Math.max(4, iNoon + 1),
+      at: atNoon,
       score: rec.divergence_score,
       confidence: rec.confidence,
       side: rec.suggested_side,
@@ -162,7 +219,7 @@ function buildReplayStops(
     {
       when: "Aug 6 4pm",
       label: "Market reprices",
-      at: Math.max(5, i4pm + 1),
+      at: at4,
       score: Math.min(30, gap(i4pm)),
       confidence: 68,
       side: "WATCH",
@@ -277,18 +334,17 @@ export default async function InvestigationPage({
     (s) => s && !s.includes("PLACEHOLDER"),
   );
 
-  const { market: mSeries, evidence: eSeries, labels } = buildSeries(
-    chartMarket.history.length ? chartMarket.history : market.history,
+  const isReplay = slug === REPLAY_SLUG;
+  const hist =
+    chartMarket.history.length ? chartMarket.history : market.history;
+  const { market: mSeries, evidence: eSeries, labels, pts } = buildSeries(
+    hist,
     evidence.social_score,
+    isReplay,
   );
 
-  const isReplay = slug === REPLAY_SLUG;
   const replayBuilt = isReplay
-    ? buildReplayStops(
-        chartMarket.history.length ? chartMarket.history : market.history,
-        evidence.social_score,
-        rec,
-      )
+    ? buildReplayStops(pts, evidence.social_score, rec)
     : { stops: [] as ReplayStop[], flagAt: null as number | null, initialStop: 0 };
 
   const venue = isReplay

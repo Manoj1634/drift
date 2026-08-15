@@ -162,7 +162,10 @@ export async function getMarket(slug: string, asOf?: string): Promise<Market> {
     for (const o of outcomes) odds_by_outcome[o.title] = o.price;
 
     const leading = outcomes.reduce((a, b) => (a.price >= b.price ? a : b));
-    const end = asOf ? Math.floor(Date.parse(asOf) / 1000) : Math.floor(Date.now() / 1000);
+    // +120s so the cutoff candle (e.g. Aug 6 12:00:20) is included when asOf is noon.
+    const end = asOf
+      ? Math.floor(Date.parse(asOf) / 1000) + 120
+      : Math.floor(Date.now() / 1000);
     const start = end - 14 * 24 * 3600;
 
     let history: PricePoint[] = [];

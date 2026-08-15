@@ -22,8 +22,10 @@ function leading(odds: Record<string, number>) {
   return Object.entries(odds).sort((a, b) => b[1] - a[1])[0];
 }
 
+/** Format a 0–1 probability as a percentage label. */
 function pct(v: number) {
-  return `${(Math.round(v * 10) / 10).toFixed(v % 1 ? 1 : 0)}%`;
+  const p = Math.round(v * 1000) / 10;
+  return `${p % 1 ? p.toFixed(1) : p}%`;
 }
 
 function historyPct(m: Market, max = 15): number[] {

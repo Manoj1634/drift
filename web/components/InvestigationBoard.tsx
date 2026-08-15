@@ -92,7 +92,7 @@ export default function InvestigationBoard({
                 Volume <b>{volumeLabel}</b>
               </span>
               <span>
-                Market <b>{Math.round(oddsNow)}%</b>
+                Market <b>{Math.round(oddsNow * 10) / 10}%</b>
               </span>
               <span>
                 Evidence <b>{Math.round(evNow)}</b>
