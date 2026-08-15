@@ -1,0 +1,26 @@
+{
+  "week_of": "2026-08-04",
+  "official_rank": [
+    "The Idaho Murders: College Nightmare: Season 1",
+    "My Life With the Walter Boys: Season 3",
+    "The Bombing of Pan Am 103: Limited Series"
+  ],
+  "views": 10600000,
+  "previous_rank": 1,
+  "current_rank": 1,
+  "history": [
+    {
+      "week_of": "2026-07-27",
+      "rank": 1,
+      "views": 18200000
+    },
+    {
+      "week_of": "2026-08-04",
+      "rank": 1,
+      "views": 10600000
+    }
+  ],
+  "score": 94,
+  "source": "netflix_tudum",
+  "as_of": "2026-08-12T00:00:00Z"
+}

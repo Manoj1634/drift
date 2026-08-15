@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+/* Design tokens from feat/UI-final (+ aliases for P3 Replay). */
+:root {
+  --ground: #17161a;
+  --card: #1f1e23;
+  --inset: #26252b;
+  --rail: #1b1a1f;
+  --ink: #f2f0ec;
+  --ink-2: #c8c4bc;
+  --muted: #9c978e;
+  --hairline: #2e2c33;
+  --hairline-2: #3a383f;
+  --market: #4a8fd4;
+  --evidence: #c08438;
+  --gap-fill: rgba(192, 132, 56, 0.17);
+  --flag: #ce7166;
+  --flag-bg: rgba(206, 113, 102, 0.14);
+  --calm: #86a88c;
+  --calm-bg: rgba(134, 168, 140, 0.13);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.5),
+    0 16px 40px -16px rgba(0, 0, 0, 0.7);
+  --sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont,
+    "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+  --mono: var(--font-geist-mono), ui-monospace, "SF Mono", "JetBrains Mono",
+    Menlo, monospace;
+  --r: 14px;
+  --r-sm: 9px;
+
+  /* Aliases used by Replay / mock components */
+  --panel: var(--card);
+  --line: var(--hairline);
+  --accent: var(--market);
+  --ink-soft: var(--ink-2);
+  --background: var(--ground);
+  --foreground: var(--ink);
+}
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-card: var(--card);
+  --color-inset: var(--inset);
+  --color-rail: var(--rail);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-hairline: var(--hairline);
+  --color-hairline-2: var(--hairline-2);
+  --color-market: var(--market);
+  --color-evidence: var(--evidence);
+  --color-flag: var(--flag);
+  --color-flag-bg: var(--flag-bg);
+  --color-calm: var(--calm);
+  --color-calm-bg: var(--calm-bg);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--sans);
+  --font-mono: var(--mono);
+}
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--sans);
+}
+
+.font-display {
+  font-family: var(--sans);
+  letter-spacing: -0.02em;
+}

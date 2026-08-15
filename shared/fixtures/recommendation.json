@@ -1,0 +1,21 @@
+{
+  "market_id": "what-will-be-the-top-us-netflix-show-this-week-20260805154446618",
+  "as_of": "2026-08-06T12:00:00Z",
+  "verdict": "diverged",
+  "suggested_side": "YES",
+  "divergence_score": 72,
+  "confidence": 68,
+  "explanation": "At the Thu Aug 6 12:00 UTC cutoff the market still priced The Idaho Murders: College Nightmare near 48¢. Social chatter was weak (social 25, web 0, trend flat) — that is not the tell. The evidence gap is Tudum incumbency: the title was already last week's #1 with 18.2M views, yet the market had not priced a likely repeat at a consensus #1 level.",
+  "supporting_reasons": [
+    "Idaho Murders ~48% at cutoff — far below a consensus #1 price for an incumbent.",
+    "Previous Tudum week: #1 with 18.2M views; incumbency is knowable before this week's print.",
+    "Captured social/web scores are weak and flat — do not treat chatter as the divergence driver."
+  ],
+  "counterargument": "Incumbency is not destiny: hours often decay after a debut week, and 18.2M prior views do not guarantee another #1 print. Traders may rationally hold ~48% if they expect a mid-week fade or another title to close. Suggested side YES flags an evidence gap relative to known Tudum history, not a settled outcome.",
+  "sources": [
+    "polymarket replay cutoff 2026-08-06T12:00:00Z",
+    "netflix_tudum prior week 2026-07-27 #1 18.2M views",
+    "evidence window 2026-08-03 → 2026-08-06T12:00:00Z (social 25 / web 0 / flat)"
+  ],
+  "flagged": true
+}

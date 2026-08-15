@@ -1,0 +1,14 @@
+{
+  "as_of": "2026-08-06T12:00:00Z",
+  "market_id": "what-will-be-the-top-us-netflix-show-this-week-20260805154446618",
+  "source": "fixture",
+  "status": "fixture",
+  "memo": [
+    "Cutoff snapshot: Idaho Murders still ~48¢ on Polymarket while already last week's Tudum #1.",
+    "Prior-week ground truth: 18.2M views at #1 (week of 2026-07-27) — incumbency is the primary external signal.",
+    "Evidence Scout scores are weak (social 25 / web 0 / flat); chatter is not the divergence driver.",
+    "Correlator flags an evidence gap: market price vs known Tudum incumbency, suggested side YES.",
+    "Later path (for replay context only): market repriced toward ~99% before the next Tudum print.",
+    "Official reveal: #1 again at 10.6M views — lower hours than prior week, still #1. Signal usefulness, not guaranteed profit."
+  ]
+}
