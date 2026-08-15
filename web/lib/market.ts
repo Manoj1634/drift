@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Market, PricePoint } from "../../shared/types/contract";
+import { MARKET_TTL_MS, cached } from "./cache";
 
 export const LIVE_SLUG =
   "what-will-be-the-top-us-netflix-show-this-week-20260812180419528";
@@ -24,7 +25,7 @@ function fixturesDir() {
 async function fetchJson(url: string) {
   const res = await fetch(url, {
     headers: { "User-Agent": UA, Accept: "application/json" },
-    cache: "no-store",
+    next: { revalidate: 90 },
   });
   if (!res.ok) {
     throw new Error(`${res.status} ${url}`);
@@ -147,50 +148,55 @@ function clobHistoryToPoints(raw: unknown): PricePoint[] {
     .filter((x): x is PricePoint => x !== null);
 }
 
-export async function getMarket(slug: string, asOf?: string): Promise<Market> {
-  try {
-    const events = (await fetchJson(
-      `${GAMMA}/events?slug=${encodeURIComponent(slug)}`,
-    )) as GammaEvent[];
-    const event = Array.isArray(events) ? events[0] : events;
-    if (!event) throw new Error("empty gamma");
+async function fetchLiveMarket(slug: string, asOf?: string): Promise<Market> {
+  const events = (await fetchJson(
+    `${GAMMA}/events?slug=${encodeURIComponent(slug)}`,
+  )) as GammaEvent[];
+  const event = Array.isArray(events) ? events[0] : events;
+  if (!event) throw new Error("empty gamma");
 
-    const outcomes = outcomesFromEvent(event);
-    if (outcomes.length === 0) throw new Error("no outcomes");
+  const outcomes = outcomesFromEvent(event);
+  if (outcomes.length === 0) throw new Error("no outcomes");
 
-    const odds_by_outcome: Record<string, number> = {};
-    for (const o of outcomes) odds_by_outcome[o.title] = o.price;
+  const odds_by_outcome: Record<string, number> = {};
+  for (const o of outcomes) odds_by_outcome[o.title] = o.price;
 
-    const leading = outcomes.reduce((a, b) => (a.price >= b.price ? a : b));
-    // +120s so the cutoff candle (e.g. Aug 6 12:00:20) is included when asOf is noon.
-    const end = asOf
-      ? Math.floor(Date.parse(asOf) / 1000) + 120
-      : Math.floor(Date.now() / 1000);
-    const start = end - 14 * 24 * 3600;
+  const leading = outcomes.reduce((a, b) => (a.price >= b.price ? a : b));
+  // +120s so the cutoff candle (e.g. Aug 6 12:00:20) is included when asOf is noon.
+  const end = asOf
+    ? Math.floor(Date.parse(asOf) / 1000) + 120
+    : Math.floor(Date.now() / 1000);
+  const start = end - 14 * 24 * 3600;
 
-    let history: PricePoint[] = [];
-    if (leading.tokenId) {
-      const histRaw = await fetchJson(
-        `${CLOB}/prices-history?market=${encodeURIComponent(leading.tokenId)}&startTs=${start}&endTs=${end}&fidelity=120`,
-      );
-      history = filterHistory(clobHistoryToPoints(histRaw), asOf);
-    }
-
-    // When asOf is set, surface the cutoff price — not post-resolution odds.
-    if (asOf && history.length > 0) {
-      odds_by_outcome[leading.title] = history[history.length - 1].p;
-    }
-
-    return {
-      id: event.slug || slug,
-      title: event.title || slug,
-      odds_by_outcome,
-      history,
-      volume_24h: Number(event.volume24hr ?? event.volume ?? 0),
-      timestamp: asOf ?? new Date().toISOString(),
-      source: "polymarket",
-    };
-  } catch {
-    return fixtureFor(slug, asOf);
+  let history: PricePoint[] = [];
+  if (leading.tokenId) {
+    const histRaw = await fetchJson(
+      `${CLOB}/prices-history?market=${encodeURIComponent(leading.tokenId)}&startTs=${start}&endTs=${end}&fidelity=120`,
+    );
+    history = filterHistory(clobHistoryToPoints(histRaw), asOf);
   }
+
+  // When asOf is set, surface the cutoff price — not post-resolution odds.
+  if (asOf && history.length > 0) {
+    odds_by_outcome[leading.title] = history[history.length - 1].p;
+  }
+
+  return {
+    id: event.slug || slug,
+    title: event.title || slug,
+    odds_by_outcome,
+    history,
+    volume_24h: Number(event.volume24hr ?? event.volume ?? 0),
+    timestamp: asOf ?? new Date().toISOString(),
+    source: "polymarket",
+  };
+}
+
+export async function getMarket(slug: string, asOf?: string): Promise<Market> {
+  return cached({
+    key: `market:${slug}:${asOf ?? "live"}`,
+    ttlMs: MARKET_TTL_MS,
+    load: () => fetchLiveMarket(slug, asOf),
+    fallback: () => fixtureFor(slug, asOf),
+  });
 }

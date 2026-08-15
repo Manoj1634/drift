@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Culture, Evidence, Market, Recommendation } from "../../shared/types/contract";
+import { SLOW_TTL_MS, cached } from "./cache";
 import { loadRootEnv } from "./correlator";
 
 export type InvestigatorMemo = {
@@ -161,43 +162,46 @@ export async function runInvestigator(opts: {
     opts.recommendation,
   );
 
-  try {
-    // Dynamic import keeps @cursor/sdk out of the page module graph when unused.
-    const { Agent } = await import(/* webpackIgnore: true */ "@cursor/sdk");
-    const run = Agent.prompt(prompt, {
-      apiKey,
-      model: { id: "grok-4.6" },
-      local: { cwd: join(process.cwd(), "..") },
-    });
-    const result = await Promise.race([
-      run,
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("investigator timeout")), timeoutMs),
-      ),
-    ]);
-    const text =
-      typeof result === "object" && result && "result" in result
-        ? String((result as { result?: string }).result ?? "")
-        : String(result ?? "");
-    const memo = parseMemo(text);
-    if (memo.length < 4) throw new Error("memo too short");
-    const out: InvestigatorMemo = {
-      as_of: asOf,
-      market_id: marketId,
-      source: "cursor_sdk",
-      status: "live",
-      memo,
-    };
-    return out;
-  } catch {
-    return {
+  return cached({
+    key: `inv:${marketId}:${asOf}`,
+    ttlMs: SLOW_TTL_MS,
+    load: async () => {
+      // Dynamic import keeps @cursor/sdk out of the page module graph when unused.
+      const { Agent } = await import(/* webpackIgnore: true */ "@cursor/sdk");
+      const run = Agent.prompt(prompt, {
+        apiKey,
+        model: { id: "grok-4.6" },
+        local: { cwd: join(process.cwd(), "..") },
+      });
+      const result = await Promise.race([
+        run,
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("investigator timeout")), timeoutMs),
+        ),
+      ]);
+      const text =
+        typeof result === "object" && result && "result" in result
+          ? String((result as { result?: string }).result ?? "")
+          : String(result ?? "");
+      const memo = parseMemo(text);
+      if (memo.length < 4) throw new Error("memo too short");
+      const out: InvestigatorMemo = {
+        as_of: asOf,
+        market_id: marketId,
+        source: "cursor_sdk",
+        status: "live",
+        memo,
+      };
+      return out;
+    },
+    fallback: () => ({
       ...fixture,
       as_of: asOf,
       market_id: marketId,
       status: "fixture",
       source: "fixture",
-    };
-  }
+    }),
+  });
 }
 
 export async function captureInvestigatorFixture(opts: {

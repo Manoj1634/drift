@@ -6,6 +6,7 @@ import type {
   EvidenceSource,
   EvidenceTrend,
 } from "../../shared/types/contract";
+import { SLOW_TTL_MS, bucketIso, cached } from "./cache";
 
 export const REPLAY_SHOW = "The Idaho Murders: College Nightmare: Season 1";
 export const REPLAY_WINDOW_START = "2026-08-03T00:00:00Z";
@@ -218,11 +219,46 @@ function toEvidence(
   };
 }
 
-export async function getEvidence(
+async function fetchLiveEvidence(
   show: string,
   windowStart: string,
   windowEnd: string,
 ): Promise<Evidence> {
+  const apiKey = process.env.XAI_API_KEY!;
+  const attempts: Array<() => Promise<{ text: string; source: EvidenceSource } | null>> =
+    [
+      () => callGrok(apiKey, show, windowStart, windowEnd, "x_search"),
+      () => callGrok(apiKey, show, windowStart, windowEnd, "web_search"),
+      () => callGrokReasoning(apiKey, show, windowStart, windowEnd),
+    ];
+
+  for (const attempt of attempts) {
+    const result = await attempt();
+    if (!result) continue;
+    const parsed = parseGrokJson(result.text);
+    if (!parsed) continue;
+    const evidence = toEvidence(
+      show,
+      windowStart,
+      windowEnd,
+      parsed,
+      result.source,
+    );
+    if (result.source === "grok_reasoning") {
+      evidence.snippets = [];
+    }
+    return evidence;
+  }
+  throw new Error("no live evidence");
+}
+
+export async function getEvidence(
+  show: string,
+  windowStartRaw: string,
+  windowEndRaw: string,
+): Promise<Evidence> {
+  const windowStart = bucketIso(windowStartRaw);
+  const windowEnd = bucketIso(windowEndRaw);
   const useFixture =
     process.env.USE_DEMO_FIXTURES === "true" || !process.env.XAI_API_KEY;
 
@@ -231,39 +267,15 @@ export async function getEvidence(
     return { ...fixture, show, window_start: windowStart, window_end: windowEnd };
   }
 
-  const apiKey = process.env.XAI_API_KEY!;
-
-  try {
-    const attempts: Array<() => Promise<{ text: string; source: EvidenceSource } | null>> =
-      [
-        () => callGrok(apiKey, show, windowStart, windowEnd, "x_search"),
-        () => callGrok(apiKey, show, windowStart, windowEnd, "web_search"),
-        () => callGrokReasoning(apiKey, show, windowStart, windowEnd),
-      ];
-
-    for (const attempt of attempts) {
-      const result = await attempt();
-      if (!result) continue;
-      const parsed = parseGrokJson(result.text);
-      if (!parsed) continue;
-      const evidence = toEvidence(
-        show,
-        windowStart,
-        windowEnd,
-        parsed,
-        result.source,
-      );
-      if (result.source === "grok_reasoning") {
-        evidence.snippets = [];
-      }
-      return evidence;
-    }
-  } catch {
-    /* fall through to fixture */
-  }
-
-  const fixture = fromFixture();
-  return { ...fixture, show, window_start: windowStart, window_end: windowEnd };
+  return cached({
+    key: `evidence:${show}:${windowStart}:${windowEnd}`,
+    ttlMs: SLOW_TTL_MS,
+    load: () => fetchLiveEvidence(show, windowStart, windowEnd),
+    fallback: () => {
+      const fixture = fromFixture();
+      return { ...fixture, show, window_start: windowStart, window_end: windowEnd };
+    },
+  });
 }
 
 /** Capture replay-window evidence once and overwrite the shared fixture. */

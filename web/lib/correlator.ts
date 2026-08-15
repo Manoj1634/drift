@@ -9,6 +9,7 @@ import type {
   Verdict,
 } from "../../shared/types/contract";
 import { RECOMMENDATION_KEYS } from "../../shared/types/contract";
+import { SLOW_TTL_MS, cached } from "./cache";
 import {
   REPLAY_CUTOFF,
   REPLAY_SLUG,
@@ -316,16 +317,17 @@ export async function correlate(
   }
 
   const apiKey = process.env.XAI_API_KEY!.trim();
-  try {
-    return await callGrokChat(apiKey, market, evidence, safeCulture, asOf);
-  } catch {
-    return {
+  return cached({
+    key: `corr:${market.id}:${asOf ?? "live"}:${evidence.show}:${evidence.window_start}:${evidence.window_end}`,
+    ttlMs: SLOW_TTL_MS,
+    load: () => callGrokChat(apiKey, market, evidence, safeCulture, asOf),
+    fallback: () => ({
       ...fixture,
       market_id: market.id,
       as_of: asOf ?? fixture.as_of,
       source: "fixture",
-    };
-  }
+    }),
+  });
 }
 
 export async function correlateForSlug(
