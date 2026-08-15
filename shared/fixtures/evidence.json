@@ -1,0 +1,16 @@
+{
+  "show": "The Idaho Murders: College Nightmare: Season 1",
+  "window_start": "2026-08-03T00:00:00Z",
+  "window_end": "2026-08-06T12:00:00Z",
+  "social_score": 86,
+  "web_score": 74,
+  "trend": "rising",
+  "top_sources": [
+    "PLACEHOLDER"
+  ],
+  "snippets": [
+    "PLACEHOLDER - P2 replaces with real Grok X/Web search output"
+  ],
+  "timestamp": "2026-08-06T12:00:00Z",
+  "source": "grok_search"
+}
