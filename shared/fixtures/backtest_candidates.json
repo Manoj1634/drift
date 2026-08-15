@@ -1,0 +1,92 @@
+[
+  {
+    "week_of": "2026-07-21",
+    "event_id": "708398",
+    "slug": "what-will-be-the-top-us-netflix-show-this-week-20260715162849089",
+    "volume": 138713,
+    "winner": "The Hawk: Season 1",
+    "open": 0.42,
+    "final": 0.9995,
+    "swing": 0.58
+  },
+  {
+    "week_of": "2026-07-07",
+    "event_id": "655265",
+    "slug": "what-will-be-the-top-us-netflix-show-this-week-20260701141127295",
+    "volume": 93228,
+    "winner": "Worst Neighbor Ever",
+    "open": 0.495,
+    "final": 0.9995,
+    "swing": 0.505
+  },
+  {
+    "week_of": "2026-01-13",
+    "event_id": "147785",
+    "slug": "what-will-be-the-top-us-netflix-show-this-week-486",
+    "volume": 115829,
+    "winner": "His & Hers",
+    "open": 0.5,
+    "final": 0.9755,
+    "swing": 0.476
+  },
+  {
+    "week_of": "2026-04-07",
+    "event_id": "333464",
+    "slug": "what-will-be-the-top-us-netflix-show-this-week-993",
+    "volume": 134113,
+    "winner": "XO, Kitty Season 3",
+    "open": 0.5,
+    "final": 0.981,
+    "swing": 0.481
+  },
+  {
+    "week_of": "2025-12-23",
+    "event_id": "106771",
+    "slug": "what-will-be-the-top-us-netflix-show-this-week-482",
+    "volume": 102846,
+    "winner": "Jake Paul vs. Anthony Joshua",
+    "open": 0.535,
+    "final": 0.914,
+    "swing": 0.379
+  },
+  {
+    "week_of": "2026-02-10",
+    "event_id": "197744",
+    "slug": "what-will-be-the-top-us-netflix-show-this-week-338",
+    "volume": 101523,
+    "winner": "Bridgerton: Season 4",
+    "open": 0.635,
+    "final": 0.9695,
+    "swing": 0.335
+  },
+  {
+    "week_of": "2026-01-06",
+    "event_id": "133343",
+    "slug": "what-will-be-the-top-us-netflix-show-this-week-812",
+    "volume": 287232,
+    "winner": "Stranger Things: Season 5",
+    "open": 0.705,
+    "final": 0.9435,
+    "swing": 0.239
+  },
+  {
+    "week_of": "2025-12-30",
+    "event_id": "119023",
+    "slug": "what-will-be-the-top-us-netflix-show-this-week-648",
+    "volume": 739984,
+    "winner": "Stranger Things: Season 5",
+    "open": 0.745,
+    "final": 0.785,
+    "swing": 0.04
+  },
+  {
+    "week_of": "2026-03-03",
+    "event_id": "228599",
+    "slug": "what-will-be-the-top-us-netflix-show-this-week-471",
+    "volume": 137651,
+    "winner": "Bridgerton: Season 4",
+    "open": 0.75,
+    "final": 0.997,
+    "swing": 0.247
+  }
+]

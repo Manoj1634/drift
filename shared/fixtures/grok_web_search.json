@@ -1,0 +1,734 @@
+{
+  "created_at": 1786815297,
+  "completed_at": 1786815297,
+  "id": "bb1a5ba9-d320-9bda-b610-244dfcc3adf3",
+  "max_output_tokens": null,
+  "model": "grok-4.6",
+  "object": "response",
+  "output": [
+    {
+      "id": "rs_bb1a5ba9-d320-9bda-b610-244dfcc3adf3",
+      "summary": [
+        {
+          "text": "The question is: \"What was the #1 show on Netflix in the US the week of July 19, 2026?\"\n",
+          "type": "summary_text"
+        }
+      ],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "ws_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-0",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "search",
+        "query": "#1 show on Netflix in the US the week of July 19, 2026",
+        "sources": [
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/new-on-netflix"
+          },
+          {
+            "type": "url",
+            "url": "https://www.whats-on-netflix.com/coming-soon/whats-coming-to-netflix-in-july-2026/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.youtube.com/watch?v=k4ljbbwZlpE"
+          },
+          {
+            "type": "url",
+            "url": "https://www.facebook.com/netflixlifedotcom/posts/full-list-of-new-netflix-shows-and-movies-coming-in-july-2026-/1489743946289877/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/top-10-july-20-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.tvline.com/2217085/what-to-watch-week-of-july-19-2026-tv-shows-movies/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.vulture.com/article/new-on-netflix-movies-shows-originals.html"
+          },
+          {
+            "type": "url",
+            "url": "https://www.howtogeek.com/new-netflix-shows-to-watch-in-july-2026/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.rottentomatoes.com/browse/tv_series_browse/affiliates:netflix~sort:popular"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ws_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-1",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "search",
+        "query": "Netflix top 10 US July 19 2026",
+        "sources": [
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/top10/united-states"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/top10/netflix/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/most-watched-movies-h1-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.youtube.com/watch?v=k4ljbbwZlpE"
+          },
+          {
+            "type": "url",
+            "url": "https://www.whats-on-netflix.com/whats-new/new-releases-on-netflix-this-week-and-top-10-movies-series-july-18-2026/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/top-10-july-6-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.tomsguide.com/entertainment/netflix/5-best-new-netflix-movies-and-shows-to-stream-this-week-july-13-19-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/what-to-watch-on-netflix-july-24-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://decider.com/list/best-movies-on-netflix/"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ws_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-2",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "search",
+        "query": "\"July 19, 2026\" Netflix #1",
+        "sources": [
+          {
+            "type": "url",
+            "url": "https://www.instagram.com/p/Da_jp82DyNZ/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.instagram.com/reel/DTNeShKkX9i/?hl=en"
+          },
+          {
+            "type": "url",
+            "url": "https://en.wikipedia.org/wiki/List_of_Netflix_original_films_(since_2026)"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/top10/netflix/trinidad-and-tobago/2026-07-19/"
+          },
+          {
+            "type": "url",
+            "url": "https://x.com/BORReport/status/2079328647421599907"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tco_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-0",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "tco_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-1",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "tco_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-2",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "ws_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-3",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "search",
+        "query": "Netflix top 10 US \"week of July 19\" 2026 OR \"July 13-19\" 2026 OR \"July 20-26\" 2026",
+        "sources": [
+          {
+            "type": "url",
+            "url": "https://www.tiktok.com/discover/good-tv-shows-right-now"
+          },
+          {
+            "type": "url",
+            "url": "http://www.thefutoncritic.com/showatch/big-brother/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.facebook.com/OntarioCottageRental/posts/-new-cottage-alert-whispering-oaks-in-lake-of-bays-on-is-now-open-for-2026-reser/1712652933910810/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.the-independent.com/topic/sandra-oh"
+          },
+          {
+            "type": "url",
+            "url": "http://www.thefutoncritic.com/showatch/law-and-order-svu/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.facebook.com/groups/ontariocottage/posts/2865346923810777/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.the-independent.com/topic/josh-hartnett"
+          },
+          {
+            "type": "url",
+            "url": "http://www.thefutoncritic.com/showatch/americas-got-talent/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.tiktok.com/discover/crumbl-cookies-spoilers-july-15"
+          },
+          {
+            "type": "url",
+            "url": "https://www.facebook.com/61557911030787/posts/we-are-making-it-through-the-cold-and-snow-and-its-time-to-start-setting-our-sig/122237714036263701/"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ws_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-4",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "search",
+        "query": "site:netflix.com/tudum top 10 July 2026",
+        "sources": [
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/top-10-july-27-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/top-10-july-20-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/top-10-july-13-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/top-10-july-6-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/new-on-netflix"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/most-watched-shows-h1-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/most-watched-movies-h1-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/what-to-watch-on-netflix-july-24-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/what-to-watch-on-netflix-july-10-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/top-10-august-3-2026"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tco_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-4",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "tco_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-3",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "ws_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-5",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "search",
+        "query": "what day of the week was July 19 2026",
+        "sources": [
+          {
+            "type": "url",
+            "url": "https://www.calendar-365.com/calendar/2026/July.html"
+          },
+          {
+            "type": "url",
+            "url": "https://www.timeanddate.com/calendar/monthly.html?year=2026&month=7&country=1"
+          },
+          {
+            "type": "url",
+            "url": "https://nationaldaycalendar.com/july/19"
+          },
+          {
+            "type": "url",
+            "url": "https://www.wincalendar.com/Calendar/Date/July-19-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.checkiday.com/7/19/2026"
+          },
+          {
+            "type": "url",
+            "url": "https://prex.jlab.org/cgi-bin/DocDB/public/ShowCalendar"
+          },
+          {
+            "type": "url",
+            "url": "https://www.customcalendarmaker.com/how-long-until-july-19-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://failflow.com/whatday/july-19-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://howlongagogo.com/date/2026/july/19"
+          },
+          {
+            "type": "url",
+            "url": "https://www.generalblue.com/calendar/july-19-2026-to-july-25-2026"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ws_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-6",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "search",
+        "query": "flixpatrol netflix top 10 united states july 19 2026",
+        "sources": [
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/top10/netflix/united-states/"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/top10/netflix/"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/hours/netflix/2026-029/united-states/page-22/"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/top10/friday/world/2026-07-19/"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/top10/netflix/canada/"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/hours/netflix/2026-019/world/movies-in-english-2025/"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/top10/netflix/philippines/"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/hours/"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/top10/netflix/united-kingdom/"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tco_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-5",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "tco_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-6",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "ws_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-7",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "open_page",
+        "url": "https://www.netflix.com/tudum/articles/top-10-july-13-2026"
+      }
+    },
+    {
+      "id": "ws_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-8",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "open_page",
+        "url": "https://www.netflix.com/tudum/articles/top-10-july-20-2026"
+      }
+    },
+    {
+      "id": "tco_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-7",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "tco_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-8",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "ws_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-9",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "search",
+        "query": "flixpatrol netflix united states \"july 19, 2026\" OR \"2026-07-19\" top 10",
+        "sources": [
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/top10/netflix/united-states/2026-07-19/"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/top10/netflix/iceland/2026-07-19/"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/hours/netflix/2026-029/united-states/page-22/"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/top10/streaming/zimbabwe/2026-07-19/"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/top10/disney/barbados/2026-07-19/"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/hours/netflix/2026-029/trinidad-and-tobago/titles-in-non-english-1956-grouped/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.instagram.com/p/Da_jp82DyNZ/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.instagram.com/reel/DbAiZIisyrD/"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/calendar/top/tv-shows/streaming/2026-07-19/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.yahoo.com/entertainment/movies/articles/netflix-steamy-erotic-thriller-taken-125900058.html"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tco_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-9",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "ws_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-10",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "open_page",
+        "url": "https://flixpatrol.com/top10/netflix/united-states/2026-07-19/"
+      }
+    },
+    {
+      "id": "ws_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-11",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "open_page",
+        "url": "https://flixpatrol.com/hours/netflix/2026-029/united-states/"
+      }
+    },
+    {
+      "id": "tco_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-11",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "tco_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-10",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "ws_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-12",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "search",
+        "query": "\"#1\" OR \"number 1\" OR \"top\" \"Netflix\" \"US\" OR \"United States\" \"TV\" OR \"show\" OR \"series\" \"July 13\" OR \"July 19\" OR \"July 20\" 2026",
+        "sources": [
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/top-10-july-20-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.instagram.com/reel/DbBiBDHo1w_/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/top-10-july-13-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://flixpatrol.com/top10/netflix/united-states/2026-07-20/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.youtube.com/watch?v=k4ljbbwZlpE"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/top-10-july-27-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.instagram.com/reel/DTNeShKkX9i/?hl=en"
+          },
+          {
+            "type": "url",
+            "url": "https://editorial.rottentomatoes.com/guide/best-netflix-shows-and-movies-to-binge-watch-now/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.hollywoodreporter.com/h/charts/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.instagram.com/masynalyssa/reel/Db6zH37JoS4/"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tco_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-12",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "ws_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-13",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "search",
+        "query": "Nielsen streaming ratings Netflix \"July 20\" OR \"July 19-25\" OR \"week of July 19\" 2026",
+        "sources": [
+          {
+            "type": "url",
+            "url": "https://www.hollywoodreporter.com/tv/tv-news/virgin-river-nielsen-streaming-july-19-25-1234999980/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.instagram.com/p/DZMDZK5jK63/?hl=en"
+          },
+          {
+            "type": "url",
+            "url": "https://entertainmentstrategyguy.com/streaming-ratings/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.nielsen.com/news-center/2024/july-4-fireworks-multiple-viewing-records-set-in-nielsens-most-streamed-week-ever/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.yahoo.com/entertainment/tv/articles/stranger-things-marshals-top-final-170000955.html"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ws_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-14",
+      "type": "web_search_call",
+      "status": "completed",
+      "action": {
+        "type": "search",
+        "query": "\"Little House on the Prairie\" Netflix #1 US July 2026",
+        "sources": [
+          {
+            "type": "url",
+            "url": "https://www.facebook.com/deadline/posts/little-house-on-the-prairie-is-off-to-a-modest-start-after-arriving-on-netflix-o/1385056803494656/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.netflix.com/tudum/articles/top-10-july-13-2026"
+          },
+          {
+            "type": "url",
+            "url": "https://www.reddit.com/r/television/comments/1uwxdqi/little_house_on_the_prairie_debuts_with_64/"
+          },
+          {
+            "type": "url",
+            "url": "https://www.instagram.com/p/DVbnrtUjSj8/"
+          },
+          {
+            "type": "url",
+            "url": "https://movieweb.com/little-house-on-the-prairie-netflix-hit-western-streaming-july-2026/"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tco_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-13",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "tco_bb1a5ba9-d320-9bda-b610-244dfcc3adf3_call-925edfd0-32b5-48f2-ac7b-4181713d006e-14",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "content": [
+        {
+          "type": "output_text",
+          "text": "**Little House on the Prairie (the 2026 Netflix remake/series).**[[1]](https://movieweb.com/little-house-on-the-prairie-netflix-hit-western-streaming-july-2026/)\n\nThis was the #1 English-language TV show (and a top overall title) on Netflix for the weekly period of July 13\u201319, 2026, which includes July 19 (a Sunday). It led with 9.8 million views that week after a strong debut the prior week.[[2]](https://www.netflix.com/tudum/articles/top-10-july-13-2026)\n\nNielsen U.S. streaming data for July 13\u201319 also showed it claiming the top overall spot. Netflix\u2019s official weekly \u201cTop 10\u201d reports (published mid-week for the prior Monday\u2013Sunday period) align with this, labeling the relevant report as the \u201cWeek of July 13, 2026.\u201d The following week (July 20\u201326) saw *I Will Find You* reclaim the top TV spot. Netflix tracks separate movie and TV lists (plus English vs. non-English), and \u201cshow\u201d here refers to the leading TV series. Country-specific U.S. charts follow similar patterns to the English TV rankings.",
+          "logprobs": [],
+          "annotations": [
+            {
+              "type": "url_citation",
+              "url": "https://movieweb.com/little-house-on-the-prairie-netflix-hit-western-streaming-july-2026/",
+              "start_index": 65,
+              "end_index": 161,
+              "title": "1"
+            },
+            {
+              "type": "url_citation",
+              "url": "https://www.netflix.com/tudum/articles/top-10-july-13-2026",
+              "start_index": 395,
+              "end_index": 460,
+              "title": "2"
+            }
+          ]
+        }
+      ],
+      "id": "msg_bb1a5ba9-d320-9bda-b610-244dfcc3adf3",
+      "role": "assistant",
+      "type": "message",
+      "status": "completed"
+    }
+  ],
+  "parallel_tool_calls": true,
+  "previous_response_id": null,
+  "reasoning": {
+    "effort": "high",
+    "summary": "detailed"
+  },
+  "temperature": 0.7,
+  "text": {
+    "format": {
+      "type": "text"
+    }
+  },
+  "tool_choice": "auto",
+  "tools": [
+    {
+      "type": "web_search",
+      "search_context_size": "medium"
+    }
+  ],
+  "top_p": 0.95,
+  "usage": {
+    "input_tokens": 176291,
+    "input_tokens_details": {
+      "cached_tokens": 131840
+    },
+    "output_tokens": 6827,
+    "output_tokens_details": {
+      "reasoning_tokens": 6581
+    },
+    "total_tokens": 183118,
+    "num_sources_used": 0,
+    "num_server_side_tools_used": 15,
+    "cost_in_usd_ticks": 2707840000,
+    "server_side_tool_usage_details": {
+      "web_search_calls": 15,
+      "x_search_calls": 0,
+      "code_interpreter_calls": 0,
+      "file_search_calls": 0,
+      "mcp_calls": 0,
+      "document_search_calls": 0,
+      "image_generation_calls": 0
+    },
+    "context_details": {
+      "input_tokens": 32844,
+      "output_tokens": 2114
+    }
+  },
+  "user": null,
+  "incomplete_details": null,
+  "status": "completed",
+  "store": true,
+  "metadata": {
+    "system_fingerprint": "fp_a7b4933f4a93564d"
+  },
+  "background": false,
+  "service_tier": "default",
+  "truncation": "disabled",
+  "top_logprobs": 0,
+  "presence_penalty": 0.0,
+  "frequency_penalty": 0.0,
+  "prompt_cache_key": null,
+  "max_tool_calls": null,
+  "safety_identifier": null,
+  "error": null,
+  "instructions": null
+}

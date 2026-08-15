@@ -1,0 +1,198 @@
+{
+  "created_at": 1786815161,
+  "completed_at": 1786815161,
+  "id": "ad73bca9-28de-9ee7-95eb-97d876ab9fec",
+  "max_output_tokens": null,
+  "model": "grok-4.6",
+  "object": "response",
+  "output": [
+    {
+      "id": "rs_ad73bca9-28de-9ee7-95eb-97d876ab9fec",
+      "summary": [
+        {
+          "text": "The question is: \"What were people on X saying about the Netflix show 'The Hawk: Season 1' between 2026-07-17T00:00:00Z and 2026-07-19T00:00:00Z? Cite posts.\"\nI don't have access to real-time data from the future, so I can't pull actual posts about \"The Hawk: Season 1\" from July 2026. The show doesn't exist yet in our timeline, and my tools only reach up to the present.\n\nIf you're looking for discussions about a different show or want help crafting a search query for current Netflix content, let me know! Otherwise, I recommend checking X directly with the time filters for any actual releases. \ud83d\ude0a\n\nWhat do you think\u2014want to adjust the query or search for something else? Or perhaps you're testing the tool limits? Just say the word! \ud83d\ude80\n\n (Note: This is a simulated response based on the constraints; in reality, I'd use the tools as described.) \n\nBut since the instruction is to respond naturally, here's a clean version:\n\nI can't access future data, so no posts from 2026.",
+          "type": "summary_text"
+        }
+      ],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "call_id": "xs_call-95042ace-3a40-4121-99ba-248caf26400a-0",
+      "input": "{\"query\":\"\\\"The Hawk\\\" (Netflix OR \\\"Season 1\\\" OR season1) since:2026-07-17 until:2026-07-19\",\"limit\":\"10\",\"mode\":\"Latest\"}",
+      "name": "x_keyword_search",
+      "type": "custom_tool_call",
+      "id": "ctc_ad73bca9-28de-9ee7-95eb-97d876ab9fec_call-95042ace-3a40-4121-99ba-248caf26400a-0",
+      "status": "completed"
+    },
+    {
+      "call_id": "xs_call-95042ace-3a40-4121-99ba-248caf26400a-1",
+      "input": "{\"query\":\"Netflix show The Hawk Season 1\",\"limit\":\"10\",\"from_date\":\"2026-07-17\",\"to_date\":\"2026-07-19\"}",
+      "name": "x_semantic_search",
+      "type": "custom_tool_call",
+      "id": "ctc_ad73bca9-28de-9ee7-95eb-97d876ab9fec_call-95042ace-3a40-4121-99ba-248caf26400a-1",
+      "status": "completed"
+    },
+    {
+      "id": "tco_ad73bca9-28de-9ee7-95eb-97d876ab9fec_call-95042ace-3a40-4121-99ba-248caf26400a-0",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "id": "tco_ad73bca9-28de-9ee7-95eb-97d876ab9fec_call-95042ace-3a40-4121-99ba-248caf26400a-1",
+      "summary": [],
+      "type": "reasoning",
+      "status": "completed"
+    },
+    {
+      "content": [
+        {
+          "type": "output_text",
+          "text": "People on X were sharing mixed reactions to the newly released Netflix comedy series *The Hawk: Season 1* (starring Will Ferrell and Molly Shannon, about a washed-up golfer making a comeback). Netflix officially announced its availability on July 17.[[1]](https://x.com/netflix/status/2078117518460190776)\n\nPositive comments included requests for a second season, praise for it being a \"great series\" and \"phenomenal\" and \"hilarious\" (even if unexpected for a Netflix show), and descriptions of it as more character-driven than similar films like *Happy Gilmore*.[[2]](https://x.com/Tmgisme97/status/2078625884559306879)[[3]](https://x.com/nemediumllc/status/2078599677365104679)[[4]](https://x.com/Web_Golfs/status/2078575472141533538)[[5]](https://x.com/aygomyownroad/status/2078587250481213926)\n\nSome users mentioned casually adding it to their Netflix watchlists or noticing it alongside other titles.[[6]](https://x.com/audgejofasho/status/2078601105844716014)[[7]](https://x.com/Staria987YT/status/2078620525740347896)\n\nThere were also recaps posted for episodes 3 and 4.[[8]](https://x.com/reelmockery/status/2078612202701963431)[[9]](https://x.com/reelmockery/status/2078613548578562337)\n\nNot all feedback was glowing\u2014one user strongly advised against trusting anyone who called the show good or funny.[[10]](https://x.com/xBR00KSx/status/2078595733092278422)",
+          "logprobs": [],
+          "annotations": [
+            {
+              "type": "url_citation",
+              "url": "https://x.com/netflix/status/2078117518460190776",
+              "start_index": 250,
+              "end_index": 305,
+              "title": "1"
+            },
+            {
+              "type": "url_citation",
+              "url": "https://x.com/Tmgisme97/status/2078625884559306879",
+              "start_index": 563,
+              "end_index": 620,
+              "title": "2"
+            },
+            {
+              "type": "url_citation",
+              "url": "https://x.com/nemediumllc/status/2078599677365104679",
+              "start_index": 620,
+              "end_index": 679,
+              "title": "3"
+            },
+            {
+              "type": "url_citation",
+              "url": "https://x.com/Web_Golfs/status/2078575472141533538",
+              "start_index": 679,
+              "end_index": 736,
+              "title": "4"
+            },
+            {
+              "type": "url_citation",
+              "url": "https://x.com/aygomyownroad/status/2078587250481213926",
+              "start_index": 736,
+              "end_index": 797,
+              "title": "5"
+            },
+            {
+              "type": "url_citation",
+              "url": "https://x.com/audgejofasho/status/2078601105844716014",
+              "start_index": 905,
+              "end_index": 965,
+              "title": "6"
+            },
+            {
+              "type": "url_citation",
+              "url": "https://x.com/Staria987YT/status/2078620525740347896",
+              "start_index": 965,
+              "end_index": 1024,
+              "title": "7"
+            },
+            {
+              "type": "url_citation",
+              "url": "https://x.com/reelmockery/status/2078612202701963431",
+              "start_index": 1077,
+              "end_index": 1136,
+              "title": "8"
+            },
+            {
+              "type": "url_citation",
+              "url": "https://x.com/reelmockery/status/2078613548578562337",
+              "start_index": 1136,
+              "end_index": 1195,
+              "title": "9"
+            },
+            {
+              "type": "url_citation",
+              "url": "https://x.com/xBR00KSx/status/2078595733092278422",
+              "start_index": 1310,
+              "end_index": 1367,
+              "title": "10"
+            }
+          ]
+        }
+      ],
+      "id": "msg_ad73bca9-28de-9ee7-95eb-97d876ab9fec",
+      "role": "assistant",
+      "type": "message",
+      "status": "completed"
+    }
+  ],
+  "parallel_tool_calls": true,
+  "previous_response_id": null,
+  "reasoning": {
+    "effort": "high",
+    "summary": "detailed"
+  },
+  "temperature": 0.7,
+  "text": {
+    "format": {
+      "type": "text"
+    }
+  },
+  "tool_choice": "auto",
+  "tools": [
+    {
+      "type": "x_search"
+    }
+  ],
+  "top_p": 0.95,
+  "usage": {
+    "input_tokens": 9555,
+    "input_tokens_details": {
+      "cached_tokens": 1792
+    },
+    "output_tokens": 3522,
+    "output_tokens_details": {
+      "reasoning_tokens": 3221
+    },
+    "total_tokens": 13077,
+    "num_sources_used": 0,
+    "num_server_side_tools_used": 2,
+    "cost_in_usd_ticks": 475540000,
+    "server_side_tool_usage_details": {
+      "web_search_calls": 0,
+      "x_search_calls": 2,
+      "code_interpreter_calls": 0,
+      "file_search_calls": 0,
+      "mcp_calls": 0,
+      "document_search_calls": 0,
+      "image_generation_calls": 0
+    },
+    "context_details": {
+      "input_tokens": 7860,
+      "output_tokens": 2116
+    }
+  },
+  "user": null,
+  "incomplete_details": null,
+  "status": "completed",
+  "store": true,
+  "metadata": {
+    "system_fingerprint": "fp_a7b4933f4a93564d"
+  },
+  "background": false,
+  "service_tier": "default",
+  "truncation": "disabled",
+  "top_logprobs": 0,
+  "presence_penalty": 0.0,
+  "frequency_penalty": 0.0,
+  "prompt_cache_key": null,
+  "max_tool_calls": null,
+  "safety_identifier": null,
+  "error": null,
+  "instructions": null
+}
