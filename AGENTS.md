@@ -54,9 +54,9 @@ The product does **not** predict guaranteed profit and does **not** claim manipu
 
 ## UI — build against the mock
 
-`mock/index.html` is a working, self-contained mock of both screens: feed, investigation, chart, replay scrubber, agent strip, counterargument block, paper ticket. Open it, then copy its `:root` token block into the app and build the components to match. Read [`mock/README.md`](mock/README.md) first — it says what to lift (tokens, components, chart code) and what to ignore (the invented data and market names, which predate the Netflix lock).
+`mock/index.html` + `mock/app.js` is a working, self-contained mock of both screens: feed, investigation, chart, replay scrubber, agent strip, bull case, counterargument, paper ticket, Watch topic. Open it, then copy its `:root` token block into the app and build the components to match. Read [`mock/README.md`](mock/README.md) first — it says what to lift (tokens, components, chart code) and what not to treat as captured data (the evidence path is illustrative; Idaho market prices are downsampled from the CLOB fixture).
 
-Agents building UI: do not invent a second palette. The two series colors are validated for colorblind separation in both themes.
+Agents building UI: do not invent a second palette. The two series colors are validated for colorblind separation on the dark ground. The app is dark-only.
 
 ## Required Product Screens
 
