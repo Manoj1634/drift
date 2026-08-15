@@ -1,10 +1,17 @@
 import { MarketChart } from "@/components/MarketChart";
+import { EvidencePanel } from "@/components/EvidencePanel";
 import {
   LIVE_SLUG,
   REPLAY_CUTOFF,
   REPLAY_SLUG,
   getMarket,
 } from "@/lib/market";
+import {
+  REPLAY_SHOW,
+  REPLAY_WINDOW_END,
+  REPLAY_WINDOW_START,
+  getEvidence,
+} from "@/lib/evidence";
 
 function leading(odds: Record<string, number>) {
   return Object.entries(odds).sort((a, b) => b[1] - a[1])[0];
@@ -13,6 +20,11 @@ function leading(odds: Record<string, number>) {
 export default async function Feed() {
   const live = await getMarket(LIVE_SLUG);
   const replay = await getMarket(REPLAY_SLUG, REPLAY_CUTOFF);
+  const replayEvidence = await getEvidence(
+    REPLAY_SHOW,
+    REPLAY_WINDOW_START,
+    REPLAY_WINDOW_END,
+  );
   const liveLead = leading(live.odds_by_outcome);
   const replayLead = leading(replay.odds_by_outcome);
 
@@ -54,6 +66,9 @@ export default async function Feed() {
             cutoff={REPLAY_CUTOFF}
             revealAfterCutoff={false}
           />
+        </div>
+        <div className="mt-4">
+          <EvidencePanel evidence={replayEvidence} />
         </div>
       </article>
     </main>
