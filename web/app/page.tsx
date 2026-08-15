@@ -1,6 +1,5 @@
-import Link from "next/link";
 import AppShell from "@/components/AppShell";
-import { Sparkline } from "@/components/Sparkline";
+import FeedToolbar, { type FeedCard } from "@/components/FeedToolbar";
 import {
   LIVE_SLUG,
   REPLAY_CUTOFF,
@@ -39,23 +38,6 @@ function evidenceSeries(score: number, n: number): number[] {
   // Fixture trend is flat — honest flat series ending at social score.
   return Array.from({ length: Math.max(n, 2) }, () => score);
 }
-
-type FeedCard = {
-  href: string;
-  feedTitle: string;
-  blurb: string;
-  venue: string;
-  focus: string;
-  vol: string;
-  marketSeries: number[];
-  evidenceSeries: number[];
-  marketPct: number;
-  evidenceScore: number;
-  side: string;
-  score: number;
-  tone: "flag" | "calm";
-  flagAt: number | null;
-};
 
 export default async function SignalFeedPage() {
   const rec = loadRecommendationFixture();
@@ -132,65 +114,10 @@ export default async function SignalFeedPage() {
           Drift watches Netflix Top 10 prediction markets next to public
           evidence, and scores the gap between them.
         </p>
-        <div className="toolbar">
-          <div className="seg">
-            <button type="button" aria-pressed="true">
-              All
-            </button>
-            <button type="button" aria-pressed="false">
-              Diverged
-            </button>
-            <button type="button" aria-pressed="false">
-              Aligned
-            </button>
-          </div>
-          <div className="live">
-            <i className="pulse" />
-            Market 30s · evidence 10m · {live.source}/{replay.source}
-          </div>
-        </div>
-        <div className="card feed">
-          <div className="feed-head">
-            <span>Market</span>
-            <span className="hide-s">Gap shape</span>
-            <span className="r hide-s">Market</span>
-            <span className="r hide-s">Evidence</span>
-            <span className="r">Signal</span>
-          </div>
-          {cards.map((c) => {
-            const sparkM =
-              c.flagAt != null ? c.marketSeries.slice(0, c.flagAt + 1) : c.marketSeries;
-            const sparkE =
-              c.flagAt != null
-                ? c.evidenceSeries.slice(0, c.flagAt + 1)
-                : c.evidenceSeries;
-            return (
-              <Link key={c.href} href={c.href} className="row">
-                <span className="q">
-                  <span className="q-t">{c.feedTitle}</span>
-                  <span className="q-x">{c.blurb}</span>
-                  <span className="q-m">
-                    <span>{c.venue}</span>
-                    <span>{c.focus}</span>
-                    <span>Vol {c.vol}</span>
-                    <span className="why-link">View Why</span>
-                  </span>
-                </span>
-                <span className="hide-s">
-                  <Sparkline market={sparkM} evidence={sparkE} />
-                </span>
-                <span className="num big r hide-s">{pct(c.marketPct / 100)}</span>
-                <span className="num r hide-s">{c.evidenceScore}</span>
-                <span className="r">
-                  <span className={`pill ${c.tone}`}>
-                    <i className="dot" />
-                    {c.side} · {c.score}
-                  </span>
-                </span>
-              </Link>
-            );
-          })}
-        </div>
+        <FeedToolbar
+          cards={cards}
+          liveHint={`Market 30s · evidence 10m · ${live.source}/${replay.source}`}
+        />
         <p className="foot">
           Drift surfaces a divergence between public data sources. Not financial
           advice, no real trades placed, no claim of market manipulation.
