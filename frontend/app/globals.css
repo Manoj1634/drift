@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0d0d0d;
+  --bg-elevated: #161616;
+  --bg-hover: #1c1c1c;
+  --line: #2a2a2a;
+  --text: #f5f5f5;
+  --muted: #8b8b8b;
+  --yes: #3dd68c;
+  --yes-bg: #1a3d2c;
+  --no: #ff6b6b;
+  --no-bg: #2a1a1a;
+  --blue: #2e6cff;
+  --blue-hover: #3d78ff;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-elevated: var(--bg-elevated);
+  --color-hover: var(--bg-hover);
+  --color-line: var(--line);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-yes: var(--yes);
+  --color-yes-bg: var(--yes-bg);
+  --color-no: var(--no);
+  --color-no-bg: var(--no-bg);
+  --color-blue: var(--blue);
+  --color-blue-hover: var(--blue-hover);
+  --font-sans: var(--font-inter);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #333 transparent;
+}
