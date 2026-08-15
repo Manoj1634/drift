@@ -28,7 +28,7 @@ flowchart LR
 
 Three watchers pull data on independent polling cadences. The Correlator (Grok 4.6) reasons over all three signals and scores how well they agree. The Reporter turns that score into a plain-English explanation. The dashboard shows tracked markets, cultural themes, a mocked account/trade book, and — front and center — **why** each signal changed or is being recommended.
 
-Full architecture, data contracts, and cadences: see [`CONTEXT.md`](./CONTEXT.md) — treat it as the source of truth, including for Cursor/Grok while coding this repo.
+Full architecture, data contracts, and cadences: see [`CONTEXT.md`](./CONTEXT.md) (source of truth) and the rest of the docs in [`documentation/`](./documentation/README.md).
 
 ## Quick start
 
