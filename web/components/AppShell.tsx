@@ -3,7 +3,7 @@ import Link from "next/link";
 type Props = {
   children: React.ReactNode;
   flaggedCount?: number;
-  current?: "feed" | "positions";
+  current?: "feed" | "positions" | "dashboard";
 };
 
 export default function AppShell({
@@ -43,6 +43,12 @@ export default function AppShell({
             <span className={`count${flaggedCount > 0 ? " hot" : ""}`}>
               {flaggedCount}
             </span>
+          </Link>
+          <Link
+            href="/dashboard"
+            aria-current={current === "dashboard" ? "true" : undefined}
+          >
+            Markets
           </Link>
           <Link
             href="/positions"

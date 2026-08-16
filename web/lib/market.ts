@@ -200,3 +200,35 @@ export async function getMarket(slug: string, asOf?: string): Promise<Market> {
     fallback: () => fixtureFor(slug, asOf),
   });
 }
+
+export type MarketListItem = {
+  slug: string;
+  title: string;
+  volume_24h: number;
+  lead: string;
+  lead_price: number;
+  outcomes: { title: string; price: number }[];
+};
+
+export async function listMarkets(limit = 12): Promise<MarketListItem[]> {
+  const events = (await fetchJson(
+    `${GAMMA}/events?limit=${limit}&active=true&closed=false&order=volume24hr&ascending=false`,
+  )) as GammaEvent[];
+  if (!Array.isArray(events)) return [];
+  const rows: MarketListItem[] = [];
+  for (const event of events) {
+    const slug = event.slug;
+    if (!slug) continue;
+    const outcomes = outcomesFromEvent(event).sort((a, b) => b.price - a.price);
+    const lead = outcomes[0];
+    rows.push({
+      slug,
+      title: event.title || slug,
+      volume_24h: Number(event.volume24hr ?? event.volume ?? 0),
+      lead: lead?.title ?? "—",
+      lead_price: lead?.price ?? 0,
+      outcomes: outcomes.slice(0, 4).map((o) => ({ title: o.title, price: o.price })),
+    });
+  }
+  return rows;
+}

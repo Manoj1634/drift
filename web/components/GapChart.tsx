@@ -6,11 +6,15 @@ export function GapChart({
   evidence,
   flagAt,
   labels,
+  runMarks,
+  legend = true,
 }: {
   market: number[];
   evidence: number[];
   flagAt?: number | null;
   labels?: Array<[number, string]>;
+  runMarks?: number[];
+  legend?: boolean;
 }) {
   const W = 760;
   const H = 240;
@@ -80,6 +84,20 @@ export function GapChart({
           className="series-line"
           stroke="var(--evidence)"
         />
+        {(runMarks ?? []).map((i) =>
+          evidence[i] == null ? null : (
+            <g key={`run-${i}`}>
+              <circle
+                cx={X(i)}
+                cy={Y(evidence[i]!)}
+                r="4.5"
+                fill="var(--evidence)"
+                stroke="var(--card)"
+                strokeWidth="2"
+              />
+            </g>
+          ),
+        )}
         {fi != null && market[fi] != null ? (
           <g>
             <line
@@ -116,6 +134,7 @@ export function GapChart({
           {Math.round(endE)}
         </text>
       </svg>
+      {legend ? (
       <div className="legend">
         <span>
           <i style={{ background: "var(--market)" }} />
@@ -130,6 +149,7 @@ export function GapChart({
           The gap Drift is scoring
         </span>
       </div>
+      ) : null}
     </div>
   );
 }

@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import AppShell from "@/components/AppShell";
+import DriftShell from "@/components/DriftShell";
 import InvestigationBoard, {
   type ReplayStop,
 } from "@/components/InvestigationBoard";
+import { loadFeed, pendingRow } from "@/lib/feed";
 import PaperTicket from "@/components/PaperTicket";
 import {
   correlate,
@@ -247,7 +249,13 @@ export default async function InvestigationPage({
   params,
 }: PageProps<"/market/[slug]">) {
   const { slug } = await params;
-  if (slug !== LIVE_SLUG && slug !== REPLAY_SLUG) notFound();
+  if (slug !== LIVE_SLUG && slug !== REPLAY_SLUG) {
+    const feed = await loadFeed();
+    if (!feed.rows.some((r) => r.slug === slug)) {
+      feed.rows = [pendingRow(slug), ...feed.rows];
+    }
+    return <DriftShell initial={feed} initialSlug={slug} />;
+  }
 
   const asOf = slug === REPLAY_SLUG ? REPLAY_CUTOFF : undefined;
   const cultureFallback = loadCultureFixture();
