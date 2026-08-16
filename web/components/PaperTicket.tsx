@@ -2,11 +2,50 @@
 
 import { useState } from "react";
 
-type Outcome = { label: string; odds: string };
+const STAKE = 100;
 
-export default function PaperTicket({ outcomes }: { outcomes: Outcome[] }) {
-  const [chosen, setChosen] = useState(0);
+type Outcome = { label: string; odds: string; price: number };
+type Side = "YES" | "NO" | "WATCH";
+
+function paperReturn(price: number, stake = STAKE) {
+  if (!Number.isFinite(price) || price <= 0) return null;
+  return Math.round(stake / price);
+}
+
+function cents(price: number) {
+  return `${Math.round(price * 100)}¢`;
+}
+
+function defaultIndex(side: Side, n: number) {
+  if (side === "NO" && n > 1) return 1;
+  return 0;
+}
+
+export default function PaperTicket({
+  outcomes,
+  suggestedSide = "WATCH",
+  resolved,
+}: {
+  outcomes: Outcome[];
+  suggestedSide?: Side;
+  /** Resolved replay only — historical paper, not a live call. */
+  resolved?: { winnerLabel: string; entryPrice: number };
+}) {
+  const [chosen, setChosen] = useState(() =>
+    defaultIndex(suggestedSide, outcomes.length),
+  );
   const [filled, setFilled] = useState(false);
+  const pick = outcomes[chosen];
+  const hypo = pick ? paperReturn(pick.price) : null;
+  const won = Boolean(
+    resolved && pick && pick.label === resolved.winnerLabel,
+  );
+  const settled =
+    resolved && Number.isFinite(resolved.entryPrice) && resolved.entryPrice > 0
+      ? won
+        ? paperReturn(resolved.entryPrice)
+        : 0
+      : null;
 
   return (
     <section className="card ticket">
@@ -29,6 +68,29 @@ export default function PaperTicket({ outcomes }: { outcomes: Outcome[] }) {
             </button>
           ))}
         </div>
+        {hypo != null && pick ? (
+          <p className="ticket-hypo">
+            If this side is right: ${STAKE} → ${hypo}
+            <span className="mute">
+              {" "}
+              · paper only if {pick.label} at {cents(pick.price)} is correct ·
+              not advice
+            </span>
+          </p>
+        ) : null}
+        {resolved && settled != null ? (
+          <p className="ticket-hypo">
+            Would have settled: ${settled}
+            <span className="mute">
+              {" "}
+              · historical paper
+              {won
+                ? ` · $100 YES at ${cents(resolved.entryPrice)} resolved YES`
+                : " · this side did not resolve"}{" "}
+              · not a live prediction
+            </span>
+          </p>
+        ) : null}
       </div>
       <div>
         <button
@@ -43,7 +105,7 @@ export default function PaperTicket({ outcomes }: { outcomes: Outcome[] }) {
           <i className="dot" />
           <span>
             {filled
-              ? `$100 on ${outcomes[chosen]?.label} at ${outcomes[chosen]?.odds} · paper only`
+              ? `$100 on ${pick?.label} at ${pick?.odds} · paper only`
               : ""}
           </span>
         </div>

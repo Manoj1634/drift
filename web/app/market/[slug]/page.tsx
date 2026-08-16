@@ -364,11 +364,14 @@ export default async function InvestigationPage({
   const outcomes = ranks.slice(0, 2).map(([name, p]) => ({
     label: shortShow(name),
     odds: pctLabel(p),
+    price: p,
   }));
   if (outcomes.length === 1) {
+    const rest = 1 - (ranks[0]?.[1] ?? 0);
     outcomes.push({
       label: "Rest of field",
-      odds: pctLabel(1 - (ranks[0]?.[1] ?? 0)),
+      odds: pctLabel(rest),
+      price: rest,
     });
   }
 
@@ -534,7 +537,20 @@ export default async function InvestigationPage({
           </div>
         </section>
 
-        <PaperTicket outcomes={outcomes} />
+        <PaperTicket
+          outcomes={outcomes}
+          suggestedSide={rec.suggested_side}
+          resolved={
+            isReplay && lead
+              ? {
+                  winnerLabel: shortShow(
+                    culture.official_rank[0] ?? lead[0],
+                  ),
+                  entryPrice: lead[1],
+                }
+              : undefined
+          }
+        />
 
         <p className="foot">
           Drift surfaces a divergence between public data sources. Not financial
