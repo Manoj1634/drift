@@ -20,7 +20,11 @@ import {
   LIVE_SLUG,
   REPLAY_CUTOFF,
   REPLAY_SLUG,
+  UFC_EVIDENCE_TOPIC,
+  UFC_FEED_TITLE,
+  UFC_SLUG,
   getMarket,
+  isInvestigationSlug,
 } from "@/lib/market";
 import {
   getEvidence,
@@ -34,7 +38,7 @@ import type { Culture, Evidence, Market, PricePoint } from "../../../../shared/t
 export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
-  return [{ slug: LIVE_SLUG }, { slug: REPLAY_SLUG }];
+  return [{ slug: LIVE_SLUG }, { slug: REPLAY_SLUG }, { slug: UFC_SLUG }];
 }
 
 function leading(odds: Record<string, number>) {
@@ -60,7 +64,11 @@ async function loadEvidenceForSlug(slug: string, market: Market): Promise<Eviden
   const lead = leading(market.odds_by_outcome)?.[0] ?? REPLAY_SHOW;
   const end = new Date().toISOString();
   const start = new Date(Date.now() - 3 * 864e5).toISOString();
-  return getEvidence(lead, start, end);
+  return getEvidence(
+    slug === UFC_SLUG ? UFC_EVIDENCE_TOPIC : lead,
+    start,
+    end,
+  );
 }
 
 function displayText(value: string, fallback: string) {
@@ -249,7 +257,7 @@ export default async function InvestigationPage({
   params,
 }: PageProps<"/market/[slug]">) {
   const { slug } = await params;
-  if (slug !== LIVE_SLUG && slug !== REPLAY_SLUG) {
+  if (!isInvestigationSlug(slug)) {
     const feed = await loadFeed();
     if (!feed.rows.some((r) => r.slug === slug)) {
       feed.rows = [pendingRow(slug), ...feed.rows];
@@ -277,8 +285,20 @@ export default async function InvestigationPage({
     loadEvidenceForSlug(slug, market),
   ]);
 
-  const evidence: Evidence =
+  let evidence: Evidence =
     evidenceR.status === "fulfilled" ? evidenceR.value : evidenceFallback;
+  if (slug !== REPLAY_SLUG && evidence.source === "fixture") {
+    const leadPct = Math.round((leading(market.odds_by_outcome)?.[1] ?? 0.5) * 100);
+    evidence = {
+      ...evidence,
+      show: leading(market.odds_by_outcome)?.[0] ?? evidence.show,
+      social_score: leadPct,
+      web_score: leadPct,
+      trend: "flat",
+      snippets: [],
+      top_sources: [],
+    };
+  }
   const culture: Culture = redactCulture(cultureFallback, asOf);
 
   let rec: CorrelateResult = recFallback;
@@ -328,13 +348,18 @@ export default async function InvestigationPage({
       ? "mute"
       : "calm";
 
+  const isUfc = slug === UFC_SLUG;
   const explanation = displayText(
     rec.explanation,
-    "At the Aug 6 cutoff the market priced this title near 48¢ while prior Tudum incumbency was already knowable. Social chatter was weak; incumbency is the tell.",
+    isUfc
+      ? `${lead ? `${lead[0]} is ${pctLabel(lead[1])} on the live CLOB` : "Live UFC 330 book"}. Paper ticket only — Drift will not invent a Netflix-style gap.`
+      : "At the Aug 6 cutoff the market priced this title near 48¢ while prior Tudum incumbency was already knowable. Social chatter was weak; incumbency is the tell.",
   );
   const counter = displayText(
     rec.counterargument,
-    "Incumbency is not destiny: hours often decay after a debut week, and traders may rationally hold ~48% if they expect a mid-week fade.",
+    isUfc
+      ? "A live price without a live evidence window is a quote, not a disagreement. Both a real rally and a quiet book would look like this until Grok searches."
+      : "Incumbency is not destiny: hours often decay after a debut week, and traders may rationally hold ~48% if they expect a mid-week fade.",
   );
   const reasons = (rec.supporting_reasons ?? []).filter(
     (r) => r && !r.includes("PLACEHOLDER"),
@@ -358,7 +383,9 @@ export default async function InvestigationPage({
 
   const venue = isReplay
     ? "Polymarket · resolved Aug 11"
-    : "Polymarket · resolves Aug 18";
+    : isUfc
+      ? "Polymarket · UFC 330 · paper only"
+      : "Polymarket · resolves Aug 18";
   const vol = `$${Math.round(market.volume_24h || (isReplay ? 18470 : 0)).toLocaleString("en-US")}`;
 
   const outcomes = ranks.slice(0, 2).map(([name, p]) => ({
@@ -388,7 +415,7 @@ export default async function InvestigationPage({
         </Link>
 
         <InvestigationBoard
-          title={market.title}
+          title={isUfc ? UFC_FEED_TITLE : market.title}
           venue={venue}
           volumeLabel={vol}
           ranks={ranks}
@@ -442,7 +469,11 @@ export default async function InvestigationPage({
                   ? `+${evidence.web_score}`
                   : evidence.trend}
               </div>
-              <div className="step-s">web / tudum · week of {culture.week_of}</div>
+              <div className="step-s">
+                {isUfc
+                  ? `web / social · ${UFC_FEED_TITLE}`
+                  : `web / tudum · week of ${culture.week_of}`}
+              </div>
             </div>
             <div className="step">
               <div className="step-n">

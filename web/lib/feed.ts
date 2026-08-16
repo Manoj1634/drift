@@ -18,6 +18,9 @@ import {
   LIVE_SLUG,
   REPLAY_CUTOFF,
   REPLAY_SLUG,
+  UFC_EVIDENCE_TOPIC,
+  UFC_FEED_TITLE,
+  UFC_SLUG,
   getMarket,
   listMarkets,
   type MarketListItem,
@@ -242,7 +245,7 @@ async function evidenceFor(slug: string, market: Market): Promise<Evidence> {
   const lead = leading(market.odds_by_outcome)[0]?.[0] ?? REPLAY_SHOW;
   const end = new Date().toISOString();
   const start = new Date(Date.now() - 3 * 864e5).toISOString();
-  return getEvidence(lead, start, end);
+  return getEvidence(slug === UFC_SLUG ? UFC_EVIDENCE_TOPIC : lead, start, end);
 }
 
 export function toFeedRow(input: {
@@ -282,6 +285,7 @@ export function toFeedRow(input: {
   }
   const isReplay = slug === REPLAY_SLUG;
   const isLiveLocked = slug === LIVE_SLUG;
+  const isUfc = slug === UFC_SLUG;
   const replay =
     isReplay
       ? IDAHO_REPLAY.map((s) => ({
@@ -321,16 +325,20 @@ export function toFeedRow(input: {
     slug,
     venue: isReplay
       ? `Polymarket · cutoff ${REPLAY_CUTOFF.slice(0, 10)}`
-      : market.source === "polymarket"
-        ? "Polymarket · live"
-        : "Polymarket · fixture",
+      : isUfc
+        ? "Polymarket · paper only"
+        : market.source === "polymarket"
+          ? "Polymarket · live"
+          : "Polymarket · fixture",
     vol: formatVol(market.volume_24h),
     q: market.title,
     feedTitle: isReplay
       ? "Week of Aug 4 · Idaho Murders"
       : isLiveLocked
         ? "This week · Walter Boys"
-        : market.title,
+        : isUfc
+          ? UFC_FEED_TITLE
+          : market.title,
     focus: lead[0],
     blurb: explain.split(".")[0] + ".",
     market: marketPts,
@@ -364,8 +372,14 @@ export function toFeedRow(input: {
         : "pending",
     },
     scored: input.scored !== false,
-    featured: isReplay || isLiveLocked,
-    hint: isReplay ? "Resolved Aug 11" : isLiveLocked ? "Resolves this week" : "Live book",
+    featured: isReplay || isLiveLocked || isUfc,
+    hint: isReplay
+      ? "Resolved Aug 11"
+      : isLiveLocked
+        ? "Resolves this week"
+        : isUfc
+          ? "UFC 330 · paper only"
+          : "Live book",
   };
 }
 
@@ -497,15 +511,17 @@ export async function investigateSlug(slug: string): Promise<FeedRow> {
 
 export async function loadFeed(): Promise<FeedPayload> {
   loadRootEnv();
-  const [liveM, replayM, listed] = await Promise.all([
+  const [liveM, replayM, ufcM, listed] = await Promise.all([
     getMarket(LIVE_SLUG),
     getMarket(REPLAY_SLUG, REPLAY_CUTOFF),
+    getMarket(UFC_SLUG),
     listMarkets(16).catch(() => [] as MarketListItem[]),
   ]);
 
   const scored = await Promise.allSettled([
     investigateSlug(LIVE_SLUG),
     investigateSlug(REPLAY_SLUG),
+    investigateSlug(UFC_SLUG),
   ]);
 
   const liveRow =
@@ -552,13 +568,58 @@ export async function loadFeed(): Promise<FeedPayload> {
           scored: false,
         });
 
+  const ufcRow =
+    scored[2].status === "fulfilled" &&
+    Object.keys(ufcM.odds_by_outcome).length > 0
+      ? scored[2].value
+      : Object.keys(ufcM.odds_by_outcome).length > 0
+        ? toFeedRow({
+            slug: UFC_SLUG,
+            market: ufcM,
+            evidence: {
+              show: UFC_EVIDENCE_TOPIC,
+              window_start: "",
+              window_end: "",
+              social_score: Math.round(
+                (leading(ufcM.odds_by_outcome)[0]?.[1] ?? 0.5) * 100,
+              ),
+              web_score: Math.round(
+                (leading(ufcM.odds_by_outcome)[0]?.[1] ?? 0.5) * 100,
+              ),
+              trend: "flat",
+              top_sources: [],
+              snippets: [],
+              timestamp: ufcM.timestamp,
+              source: "fixture",
+            },
+            rec: {
+              ...loadRecommendationFixture(),
+              verdict: "aligned",
+              flagged: false,
+              divergence_score: 12,
+              suggested_side: "WATCH",
+              explanation: `${leading(ufcM.odds_by_outcome)[0]?.[0] ?? "The favorite"} is priced on the live CLOB. Paper ticket only — Drift will not invent a gap from the Netflix fixture.`,
+              counterargument:
+                "A live price without a live evidence window is a quote, not a disagreement.",
+            },
+            scored: false,
+          })
+        : null;
+
   const extras = listed
-    .filter((m) => m.slug !== LIVE_SLUG && m.slug !== REPLAY_SLUG)
+    .filter(
+      (m) =>
+        m.slug !== LIVE_SLUG &&
+        m.slug !== REPLAY_SLUG &&
+        m.slug !== UFC_SLUG &&
+        m.lead_price > 0.02 &&
+        m.lead_price < 0.98,
+    )
     .slice(0, 4)
     .map(listItemToRow);
 
   return {
-    rows: [replayRow, liveRow, ...extras],
+    rows: [replayRow, liveRow, ...(ufcRow ? [ufcRow] : []), ...extras],
     listed_at: new Date().toISOString(),
   };
 }

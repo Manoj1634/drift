@@ -1,13 +1,13 @@
 import AppShell from "@/components/AppShell";
 import Link from "next/link";
-import { LIVE_SLUG, REPLAY_SLUG } from "@/lib/market";
+import { LIVE_SLUG, REPLAY_SLUG, UFC_SLUG } from "@/lib/market";
 
 export default function PositionsPage() {
   return (
     <AppShell flaggedCount={1} current="positions">
       <div className="view">
         <p className="eyebrow">Paper positions</p>
-        <h1>Two open. Nothing real was placed.</h1>
+        <h1>Paper only. Nothing real was placed.</h1>
         <p className="lede">
           Every position Drift logs is local. There is no wallet, no signing, and
           no order ever reaches an exchange.
@@ -36,6 +36,16 @@ export default function PositionsPage() {
             <span>
               <span className="pos-t">Walter Boys · WATCH</span>
               <span className="pos-x">Live week · no stake yet</span>
+            </span>
+            <span className="hide-s num">—</span>
+            <span className="r hide-s num">—</span>
+            <span className="r num">$0</span>
+            <span className="r num">—</span>
+          </Link>
+          <Link href={`/market/${UFC_SLUG}`} className="pos-row">
+            <span>
+              <span className="pos-t">UFC 330 · Makhachev vs Machado Garry</span>
+              <span className="pos-x">Live book · paper only</span>
             </span>
             <span className="hide-s num">—</span>
             <span className="r hide-s num">—</span>

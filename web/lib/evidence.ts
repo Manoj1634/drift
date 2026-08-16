@@ -120,15 +120,15 @@ function fromFixture(): Evidence {
 
 function buildPrompt(show: string, windowStart: string, windowEnd: string) {
   return [
-    `Analyze public conversation about the Netflix show "${show}"`,
+    `Analyze public conversation about "${show}"`,
     `strictly between ${windowStart} and ${windowEnd}.`,
     "Use live search tools restricted to that date window.",
     "Return ONLY strict JSON (no markdown, no commentary) with this shape:",
     '{"social_score":0-100,"web_score":0-100,"trend":"rising|flat|falling",',
     '"snippets":[{"text":"quote or paraphrase","source":"@handle or URL","date":"ISO8601"}],',
     '"top_sources":["url or handle"]}',
-    "Scores mean volume and velocity of conversation about this show in this window",
-    "relative to typical TV chatter.",
+    "Scores mean volume and velocity of conversation about this topic in this window",
+    "relative to typical chatter for the same kind of event.",
     "Every snippet date MUST be on or before the window end.",
     "Include at least 3 real snippets with timestamps when search results exist.",
   ].join(" ");

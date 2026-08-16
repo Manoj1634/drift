@@ -2,26 +2,41 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { GapChart } from "@/components/GapChart";
+import PaperTicket from "@/components/PaperTicket";
 
-type Outcome = { label: string; odds: string };
-
+type Outcome = { label: string; odds: string; price: number };
+type AgentMeta = {
+  market: string;
+  evidence: string;
+  correlator: string;
+  investigator: string;
+};
+type Source = [string, "mk" | "ev", string];
 type LogLine = { id: number; text: string; kind: "sys" | "x" | "src" | "ev" | "done" };
-
-const SCRIPT: Array<{ wait: number; text: string; kind: LogLine["kind"]; bump: number }> = [
-  { wait: 420, text: "Spinning Evidence Scout…", kind: "sys", bump: 0 },
-  { wait: 700, text: "Scraping Twitter / X", kind: "x", bump: 1.5 },
-  { wait: 640, text: "Gathering leads", kind: "x", bump: 1.2 },
-  { wait: 720, text: "@tudum · overnight finishers clustering", kind: "src", bump: 1.4 },
-  { wait: 680, text: "Scoring chatter vs the book", kind: "ev", bump: 1.6 },
-  { wait: 760, text: "Correlator vs CLOB print", kind: "ev", bump: 1.3 },
-  { wait: 500, text: "Run complete", kind: "done", bump: 0.8 },
-];
 
 function clamp(n: number) {
   return Math.max(0, Math.min(100, Math.round(n * 10) / 10));
 }
 
+function honestLogs(agents: AgentMeta, sources: Source[]): LogLine[] {
+  const lines: LogLine[] = [
+    { id: 1, text: `Market Pulse · ${agents.market}`, kind: "sys" },
+    { id: 2, text: `Evidence Scout · ${agents.evidence}`, kind: "ev" },
+    { id: 3, text: `Correlator · ${agents.correlator}`, kind: "ev" },
+    { id: 4, text: `Investigator · ${agents.investigator}`, kind: "done" },
+  ];
+  sources.slice(0, 3).forEach((s, i) => {
+    lines.push({
+      id: 10 + i,
+      text: `${s[0]} · ${s[2]}`,
+      kind: s[1] === "mk" ? "sys" : "src",
+    });
+  });
+  return lines;
+}
+
 export default function BetDesk({
+  slug,
   title,
   venue,
   volumeLabel,
@@ -29,7 +44,12 @@ export default function BetDesk({
   evidenceSeries,
   labels,
   outcomes,
+  sources = [],
+  agents,
+  scored = false,
+  onRescout,
 }: {
+  slug: string;
   title: string;
   venue: string;
   volumeLabel: string;
@@ -37,76 +57,65 @@ export default function BetDesk({
   evidenceSeries: number[];
   labels?: Array<[number, string]>;
   outcomes: Outcome[];
+  sources?: Source[];
+  agents: AgentMeta;
+  scored?: boolean;
+  onRescout?: () => Promise<void>;
 }) {
   const baseM = useMemo(() => {
     const src = marketSeries.length ? marketSeries : [50, 50, 50, 50, 50, 50, 50, 50];
-    return src.slice(-10);
+    return src.map(clamp);
   }, [marketSeries]);
 
-  const lastM = baseM[baseM.length - 1] ?? 50;
-  // Start aligned; mock runs open a small gap (not a 40-pt flag).
-  const startE = lastM;
-  const targetGap = 8;
+  const baseE = useMemo(() => {
+    if (evidenceSeries.length >= 2) {
+      return evidenceSeries.slice(-baseM.length).map(clamp);
+    }
+    return baseM.slice();
+  }, [evidenceSeries, baseM]);
 
-  const [phase, setPhase] = useState<"idle" | "running" | "done">("idle");
-  const [logs, setLogs] = useState<LogLine[]>([]);
-  const [ev, setEv] = useState<number[]>(() => baseM.map(() => startE));
-  const [marks, setMarks] = useState<number[]>([]);
-  const [taken, setTaken] = useState(false);
+  const lastM = baseM[baseM.length - 1] ?? 50;
+  const lastE = baseE[baseE.length - 1] ?? lastM;
+
+  const [phase, setPhase] = useState<"idle" | "running" | "done">(
+    scored ? "done" : "idle",
+  );
+  const [logs, setLogs] = useState<LogLine[]>(() =>
+    scored ? honestLogs(agents, sources) : [],
+  );
 
   useEffect(() => {
-    setEv(baseM.map(() => startE));
-  }, [baseM, startE]);
+    if (!scored) return;
+    setPhase("done");
+    setLogs(honestLogs(agents, sources));
+  }, [
+    scored,
+    slug,
+    agents.market,
+    agents.evidence,
+    agents.correlator,
+    agents.investigator,
+    sources,
+  ]);
 
   async function runAgents() {
     if (phase === "running") return;
     setPhase("running");
-    setLogs([]);
-    setMarks([]);
-    setTaken(false);
-    let series = baseM.map(() => startE);
-    setEv(series);
-
-    for (let i = 0; i < SCRIPT.length; i++) {
-      const step = SCRIPT[i]!;
-      await new Promise((r) => setTimeout(r, step.wait));
-      series = [...series];
-      const next = clamp((series[series.length - 1] ?? startE) + step.bump);
-      series.push(next);
-      if (series.length > 14) series = series.slice(-14);
-      setEv(series);
-      if (step.bump > 0) {
-        setMarks((m) => [...m, series.length - 1]);
-      }
-      setLogs((prev) => [
-        { id: Date.now() + i, text: step.text, kind: step.kind },
-        ...prev,
-      ].slice(0, 12));
+    setLogs([
+      { id: Date.now(), text: "Calling Market Pulse + Evidence Scout…", kind: "sys" },
+    ]);
+    try {
+      await onRescout?.();
+    } catch {
+      /* parent keeps prior row */
     }
-
-    // Pin a small, readable gap vs last market print.
-    const pinned = clamp(lastM + targetGap);
-    setEv((s) => {
-      const n = [...s];
-      n[n.length - 1] = pinned;
-      return n;
-    });
+    setLogs(honestLogs(agents, sources));
     setPhase("done");
   }
 
-  const mForChart =
-    ev.length > baseM.length
-      ? [
-          ...baseM,
-          ...Array.from({ length: ev.length - baseM.length }, () => lastM),
-        ]
-      : baseM;
-  const eNow = ev[ev.length - 1] ?? startE;
-  const gap = Math.round((eNow - lastM) * 10) / 10;
+  const gap = Math.round((lastE - lastM) * 10) / 10;
   const gapLabel = `${gap >= 0 ? "+" : ""}${gap}`;
-
-  const lead = outcomes[0] ?? { label: "Leader", odds: `${Math.round(lastM)}%` };
-  const side = gap >= 0 ? "YES" : "NO";
+  const lead = outcomes[0] ?? { label: "Leader", odds: `${Math.round(lastM)}%`, price: lastM / 100 };
 
   return (
     <div className="bet-desk">
@@ -126,33 +135,24 @@ export default function BetDesk({
           {phase === "running" ? (
             <div className="bet-scrim" aria-live="polite">
               <span className="bet-spin" />
-              Running agents
+              Fetching live book
             </div>
           ) : null}
           <GapChart
-            market={mForChart}
-            evidence={ev}
+            market={baseM}
+            evidence={baseE}
             labels={labels}
-            runMarks={marks}
             legend={false}
           />
-          {phase === "done" ? (
-            <div className="yn-dock">
-              <button
-                type="button"
-                className={`yn-cta${taken ? " on" : ""}`}
-                onClick={() => setTaken(true)}
-              >
-                <span className="yn-gap">{gapLabel}</span>
-                <span className="yn-vs">vs market</span>
-                <span className="yn-act">
-                  {taken
-                    ? `Paper ${side} logged`
-                    : `Take paper ${side} · ${lead.label}`}
-                </span>
-              </button>
+          <div className="yn-dock">
+            <div className="yn-cta">
+              <span className="yn-gap">{gapLabel}</span>
+              <span className="yn-vs">vs market</span>
+              <span className="yn-act">
+                {lead.label} · {lead.odds} · paper only
+              </span>
             </div>
-          ) : null}
+          </div>
         </section>
 
         {phase !== "done" ? (
@@ -162,15 +162,22 @@ export default function BetDesk({
             disabled={phase === "running"}
             onClick={() => void runAgents()}
           >
-            {phase === "running" ? "Running…" : "Run agents"}
+            {phase === "running" ? "Fetching…" : "Run agents"}
           </button>
         ) : null}
+
+        <PaperTicket
+          outcomes={outcomes}
+          suggestedSide="WATCH"
+        />
       </div>
 
       <aside className="agent-side" aria-label="Agent activity">
-        <p className="eyebrow">Agents</p>
+        <p className="eyebrow">What ran</p>
         {phase === "idle" ? (
-          <p className="agent-idle">Hit Run agents to scout X and score the book.</p>
+          <p className="agent-idle">
+            Run agents to pull Polymarket CLOB and Grok. No scripted Tudum copy.
+          </p>
         ) : null}
         <ul className="agent-log">
           {logs.map((l) => (
@@ -183,9 +190,21 @@ export default function BetDesk({
         {phase === "done" ? (
           <div className="agent-sources">
             <p className="eyebrow">Sources</p>
-            <q>X cluster: finish-through-the-night mentions, 4h window.</q>
-            <q>Web: Tudum ranking chatter, no official print yet.</q>
-            <q>CLOB: last trade {Math.round(lastM)}% · gap {gapLabel}.</q>
+            {sources.length > 0 ? (
+              sources.slice(0, 4).map((s) => (
+                <q key={`${s[0]}-${s[2]}`}>
+                  {s[0]}: {s[2]}
+                </q>
+              ))
+            ) : (
+              <>
+                <q>Polymarket: {agents.market} · last trade {Math.round(lastM)}%.</q>
+                <q>Evidence: {agents.evidence} · correlator {agents.correlator}.</q>
+              </>
+            )}
+            <q>
+              {slug} · gap {gapLabel} · paper only
+            </q>
           </div>
         ) : null}
       </aside>

@@ -3,6 +3,7 @@ import {
   LIVE_SLUG,
   REPLAY_CUTOFF,
   REPLAY_SLUG,
+  UFC_SLUG,
   getMarket,
 } from "../market";
 
@@ -64,6 +65,7 @@ async function main() {
   const live = await getMarket(LIVE_SLUG);
   const replay = await getMarket(REPLAY_SLUG);
   const replayAsOf = await getMarket(REPLAY_SLUG, REPLAY_CUTOFF);
+  const ufc = await getMarket(UFC_SLUG);
 
   let ok = true;
   ok = checkMarket("live getMarket", live) && ok;
@@ -80,6 +82,28 @@ async function main() {
   } else {
     console.log(
       `FAIL live Walter Boys odds missing/low: ${JSON.stringify(live.odds_by_outcome)} source=${live.source}`,
+    );
+    ok = false;
+  }
+
+  const makhachev = Object.keys(ufc.odds_by_outcome).find((k) =>
+    k.toLowerCase().includes("makhachev"),
+  );
+  const garry = Object.keys(ufc.odds_by_outcome).find((k) =>
+    k.toLowerCase().includes("garry"),
+  );
+  if (
+    makhachev &&
+    garry &&
+    ufc.odds_by_outcome[makhachev]! > 0 &&
+    ufc.odds_by_outcome[garry]! > 0
+  ) {
+    console.log(
+      `PASS UFC 330 odds: ${makhachev}=${ufc.odds_by_outcome[makhachev]} ${garry}=${ufc.odds_by_outcome[garry]} (${ufc.source}) hist=${ufc.history.length}`,
+    );
+  } else {
+    console.log(
+      `FAIL UFC 330 fighter odds missing: ${JSON.stringify(ufc.odds_by_outcome)} source=${ufc.source}`,
     );
     ok = false;
   }

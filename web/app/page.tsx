@@ -4,6 +4,9 @@ import {
   LIVE_SLUG,
   REPLAY_CUTOFF,
   REPLAY_SLUG,
+  UFC_EVIDENCE_TOPIC,
+  UFC_FEED_TITLE,
+  UFC_SLUG,
   getMarket,
 } from "@/lib/market";
 import {
@@ -12,8 +15,13 @@ import {
   REPLAY_WINDOW_END,
   REPLAY_WINDOW_START,
 } from "@/lib/evidence";
-import { loadRecommendationFixture } from "@/lib/correlator";
-import type { Market } from "../../shared/types/contract";
+import {
+  correlate,
+  loadCultureFixture,
+  loadRecommendationFixture,
+  type CorrelateResult,
+} from "@/lib/correlator";
+import type { Evidence, Market } from "../../shared/types/contract";
 
 export const dynamic = "force-dynamic";
 
@@ -39,13 +47,57 @@ function evidenceSeries(score: number, n: number): number[] {
   return Array.from({ length: Math.max(n, 2) }, () => score);
 }
 
+function settled<T>(r: PromiseSettledResult<T>): T | null {
+  return r.status === "fulfilled" ? r.value : null;
+}
+
+function ufcBlurb(
+  lead: [string, number] | undefined,
+  rec: CorrelateResult | null,
+  evidence: Evidence | null,
+) {
+  if (rec && !rec.explanation.includes("PLACEHOLDER")) {
+    return rec.explanation.split(".")[0] + ".";
+  }
+  if (lead) {
+    const ev =
+      evidence && evidence.source !== "fixture"
+        ? ` Public evidence scores social ${evidence.social_score} / web ${evidence.web_score}.`
+        : "";
+    return `Market prices ${lead[0]} at ${pct(lead[1])} on the live CLOB.${ev} Paper ticket only.`;
+  }
+  return "Live UFC 330 book. Paper ticket only — nothing is placed on-chain.";
+}
+
 export default async function SignalFeedPage() {
   const rec = loadRecommendationFixture();
-  const [live, replay, evidence] = await Promise.all([
+  const ufcWindowEnd = new Date().toISOString();
+  const ufcWindowStart = new Date(Date.now() - 3 * 864e5).toISOString();
+  const [liveR, replayR, evidenceR, ufcR, ufcEvR] = await Promise.allSettled([
     getMarket(LIVE_SLUG),
     getMarket(REPLAY_SLUG, REPLAY_CUTOFF),
     getEvidence(REPLAY_SHOW, REPLAY_WINDOW_START, REPLAY_WINDOW_END),
+    getMarket(UFC_SLUG),
+    getEvidence(UFC_EVIDENCE_TOPIC, ufcWindowStart, ufcWindowEnd),
   ]);
+
+  const live = settled(liveR);
+  const replay = settled(replayR);
+  const evidence = settled(evidenceR);
+  if (!live || !replay || !evidence) {
+    throw new Error("Netflix feed markets failed to load");
+  }
+
+  let ufcRec: CorrelateResult | null = null;
+  const ufc = settled(ufcR);
+  const ufcEvidence = settled(ufcEvR);
+  if (ufc && Object.keys(ufc.odds_by_outcome).length > 0 && ufcEvidence) {
+    try {
+      ufcRec = await correlate(ufc, ufcEvidence, loadCultureFixture());
+    } catch {
+      ufcRec = null;
+    }
+  }
 
   const liveLead = leading(live.odds_by_outcome);
   const replayLead = leading(replay.odds_by_outcome);
@@ -96,6 +148,35 @@ export default async function SignalFeedPage() {
     },
   ];
 
+  if (ufc && Object.keys(ufc.odds_by_outcome).length > 0) {
+    const ufcLead = leading(ufc.odds_by_outcome);
+    const ufcM = historyPct(ufc);
+    const liveEv = ufcEvidence && ufcEvidence.source !== "fixture";
+    const ufcEvScore = liveEv
+      ? ufcEvidence.social_score
+      : Math.round((ufcLead?.[1] ?? 0.5) * 100);
+    const ufcEvSeries = liveEv
+      ? evidenceSeries(ufcEvScore, ufcM.length)
+      : ufcM.map((v) => Math.max(0, Math.min(100, v)));
+    const ufcFlagged = Boolean(ufcRec?.flagged || ufcRec?.verdict === "diverged");
+    cards.push({
+      href: `/market/${UFC_SLUG}`,
+      feedTitle: UFC_FEED_TITLE,
+      blurb: ufcBlurb(ufcLead, ufcRec, ufcEvidence),
+      venue: "Polymarket · paper only",
+      focus: ufcLead?.[0] ?? "Islam Makhachev",
+      vol: `$${Math.round(ufc.volume_24h).toLocaleString("en-US")}`,
+      marketSeries: ufcM,
+      evidenceSeries: ufcEvSeries,
+      marketPct: (ufcLead?.[1] ?? 0) * 100,
+      evidenceScore: ufcEvScore,
+      side: ufcRec?.suggested_side ?? "WATCH",
+      score: ufcRec?.divergence_score ?? 12,
+      tone: ufcFlagged ? "flag" : "calm",
+      flagAt: ufcFlagged ? Math.max(0, ufcM.length - 1) : null,
+    });
+  }
+
   cards.sort((a, b) => b.score - a.score);
   const flagged = cards.filter((c) => c.tone === "flag").length;
 
@@ -111,8 +192,8 @@ export default async function SignalFeedPage() {
               : `${flagged} markets have stopped agreeing with the crowd.`}
         </h1>
         <p className="lede">
-          Drift watches Netflix Top 10 prediction markets next to public
-          evidence, and scores the gap between them.
+          Drift watches Netflix Top 10 and UFC 330 next to public evidence,
+          and scores the gap between them. Paper tickets only.
         </p>
         <FeedToolbar
           cards={cards}

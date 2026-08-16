@@ -439,13 +439,32 @@ export default function DriftShell({
           </button>
           {cur ? (
             <BetDesk
-              title={cur.q}
+              slug={cur.slug}
+              title={cur.feedTitle || cur.q}
               venue={cur.venue}
               volumeLabel={cur.vol}
               marketSeries={cur.market}
               evidenceSeries={cur.evidence}
               labels={cur.xTicks}
-              outcomes={cur.outcomes.map(([label, odds]) => ({ label, odds }))}
+              outcomes={cur.ranks.slice(0, 2).map(([label, p]) => ({
+                label,
+                odds: `${p % 1 ? p.toFixed(1) : p}%`,
+                price: p / 100,
+              }))}
+              sources={cur.sources}
+              agents={cur.agents}
+              scored={cur.scored}
+              onRescout={async () => {
+                const res = await fetch(
+                  `/api/investigate?slug=${encodeURIComponent(cur.slug)}`,
+                );
+                const next = (await res.json()) as FeedRow;
+                if (next?.slug) {
+                  setRows((prev) =>
+                    prev.map((r) => (r.slug === next.slug ? next : r)),
+                  );
+                }
+              }}
             />
           ) : (
             <p className="lede">Pick a market from the feed.</p>

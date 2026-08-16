@@ -19,6 +19,8 @@ import {
 import {
   REPLAY_CUTOFF,
   REPLAY_SLUG,
+  UFC_EVIDENCE_TOPIC,
+  UFC_SLUG,
   getMarket,
 } from "./market";
 
@@ -349,7 +351,7 @@ export async function correlateForSlug(
     slug === REPLAY_SLUG
       ? await getEvidence(REPLAY_SHOW, REPLAY_WINDOW_START, REPLAY_WINDOW_END)
       : await getEvidence(
-          lead,
+          slug === UFC_SLUG ? UFC_EVIDENCE_TOPIC : lead,
           new Date(Date.now() - 3 * 864e5).toISOString(),
           new Date().toISOString(),
         );
