@@ -64,7 +64,7 @@ No real trade execution (dashboard trades are logged, not placed on-chain), no l
 
 ## Team
 
-Manoj Padala, Shreevardhan Shah, Raj Khettry, Diwas Pandit
+Manoj Padala,  Juan Hinostroza, Raj Khettry, Diwas Pandit
 
 ## Disclaimer
 
