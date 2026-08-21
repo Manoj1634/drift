@@ -64,7 +64,7 @@ No real trade execution (dashboard trades are logged, not placed on-chain), no l
 
 ## Team
 
-*(names, Luma emails)* — built solo/together in ~3.5 hours during the event.
+Manoj Padala, Shreevardhan Shah, Raj Khettry, Diwas Pandit
 
 ## Disclaimer
 
